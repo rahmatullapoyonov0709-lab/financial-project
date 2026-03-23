@@ -53,12 +53,12 @@ export default function Register({
     }
     if (form.password !== form.confirm) {
       toast.error(t("auth.register.toasts.passwordMismatch"));
-      return;
+      returjn;
     }
 
     setLoading(true);
     try {
-      const res = await api.post("/auth/register", {
+      const res = await api.post("/api/auth/register", {
         name: form.name,
         email: form.email,
         password: form.password,
