@@ -1,0 +1,608 @@
+﻿{
+  "app": {
+    "name": "FinTrack",
+    "tagline": "Financial management",
+    "titles": {
+      "dashboard": "Dashboard",
+      "accounts": "Accounts",
+      "transactions": "Transactions",
+      "transfers": "Transfers",
+      "debts": "Debts",
+      "budget": "Budget",
+    "analytics": "Analytics",
+    "report": "Report",
+    "family": "Family",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "accounts": "Accounts",
+    "transactions": "Transactions",
+    "transfers": "Transfers",
+    "debts": "Debts",
+    "budget": "Budget",
+    "analytics": "Analytics",
+    "report": "Report",
+    "family": "Family",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "home": "Home",
+    "actions": "Actions",
+    "analysis": "Analysis",
+    "more": "More"
+  },
+  "header": {
+    "notifications": "Notifications"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Unread: {{count}}",
+    "markAll": "Mark all as read",
+    "markOne": "Mark read",
+    "markedAll": "All notifications marked as read",
+    "deleted": "Notification deleted",
+    "deleteError": "Failed to delete notification",
+    "empty": "No notifications yet",
+    "loadError": "Failed to load notifications",
+    "markReadError": "Failed to update notification"
+  },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "common": {
+    "all": "All",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "unknown": "Unknown",
+    "noData": "No data",
+    "comingSoon": "Coming soon",
+    "yes": "Yes",
+    "no": "No",
+    "select": "Select..."
+  },
+  "language": {
+    "label": "Language",
+    "uz": "Uzbek",
+    "en": "English",
+    "ru": "Russian"
+  },
+  "currency": {
+    "label": "Currency",
+    "uzs": "Uzbek so'm",
+    "usd": "US dollar",
+    "eur": "Euro",
+    "rub": "Russian ruble"
+  },
+  "theme": {
+    "label": "Theme",
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "categories": {
+    "system": {
+      "food": "Food",
+      "transport": "Transport",
+      "utilities": "Utilities",
+      "health": "Health",
+      "clothes": "Clothes",
+      "restaurant": "Restaurant",
+      "entertainment": "Entertainment",
+      "education": "Education",
+      "communication": "Communication",
+      "travel": "Travel",
+      "other": "Other",
+      "salary": "Salary",
+      "freelance": "Freelance",
+      "investment": "Investment",
+      "otherIncome": "Other income"
+    }
+  },
+  "household": {
+    "invite": {
+      "pending": "You have a family invite. Sign in and you will be added automatically."
+    },
+    "toasts": {
+      "inviteAccepted": "Invite accepted{{name}}",
+      "inviteAcceptError": "Failed to accept invite"
+    }
+  },
+  "familyPage": {
+    "subtitle": "Family mode now works as a shared financial space. Once members join, accounts, transactions, analytics, and reports are visible together.",
+    "refresh": "Refresh",
+    "myRole": "My role",
+    "memberCount": "Members",
+    "createdAt": "Created at",
+    "soloTitle": "You are still alone here",
+    "soloDescription": "The family group already exists, but right now it only contains you. Share the code so others can join and manage shared finances together.",
+    "sharedTitle": "Shared sections",
+    "sharedDescription": "The sections below now work as one shared data space for everyone in the family.",
+    "joinMoveHint": "If you enter another family code, you will move into that household and your active financial scope will follow that family.",
+    "ownerLockedHint": "You are the owner and there are other members in this family. Remove them first before switching to another household.",
+    "membersDescription": "The owner manages members, while members work with the same shared financial data.",
+    "sharedItems": {
+      "accounts": "Accounts and balances",
+      "transactions": "Transaction history",
+      "analytics": "Analytics and reports",
+      "report": "Report page",
+      "budget": "Budgets and limits",
+      "debts": "Debts and obligations"
+    }
+  },
+  "dashboard": {
+    "greeting": "Hello,",
+    "expenseAction": "Expense",
+    "incomeAction": "Income",
+    "transferAction": "Transfer",
+    "stats": {
+      "totalBalance": "Total balance",
+      "income": "Income",
+      "expense": "Expense",
+      "transactions": "Transactions",
+      "count": "{{count}} items"
+    },
+    "monthlyDynamics": "Monthly dynamics",
+    "noTransactionsYet": "No transactions yet",
+    "accounts": "Accounts",
+    "viewAll": "View all",
+    "noAccounts": "No accounts",
+    "recentTransactions": "Recent transactions",
+    "budget": "Budget",
+    "noBudget": "No budget configured",
+    "family": {
+      "activeTitle": "Family finance mode is active",
+      "activeText": "Shared budget and reports are active for {{count}} members in \"{{name}}\".",
+      "personalTitle": "Personal finance mode",
+      "personalText": "This profile is still personal. Once family sharing is active, budget and reports become shared.",
+      "openFamily": "Open family",
+      "openBudget": "Open budget"
+    },
+    "used": "Used",
+    "limit": "Limit"
+  },
+  "transactions": {
+    "filters": {
+      "all": "All",
+      "income": "Income",
+      "expense": "Expense"
+    },
+    "new": "New",
+    "emptyTitle": "No transactions yet",
+    "addFirst": "+ Add first one",
+    "newTransaction": "New transaction",
+    "type": "Type",
+    "amount": "Amount",
+    "account": "Account",
+    "category": "Category",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "For example: Weekly groceries",
+    "date": "Date",
+    "select": "Select...",
+    "add": "Add",
+    "requiredFields": "Please fill all required fields!",
+    "incomeAdded": "Income added",
+    "expenseAdded": "Expense added",
+    "deleted": "Deleted",
+    "loadError": "Failed to load transactions",
+    "categoryAccountDate": "{{account}} · {{description}} · {{date}}"
+  },
+  "report": {
+    "periods": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "previousPeriod": "Previous period",
+    "currentPeriod": "Current period",
+    "cards": {
+      "totalIncome": "Total income",
+      "totalExpense": "Total expense",
+      "netResult": "Net result",
+      "topExpense": "Top expense",
+      "topIncome": "Top income",
+      "noInfo": "No data"
+    },
+    "sections": {
+      "expenses": "Expenses",
+      "incomes": "Incomes",
+      "previousExpenses": "Previous period expenses",
+      "currentExpenses": "Current period expenses",
+      "previousIncomes": "Previous period incomes",
+      "currentIncomes": "Current period incomes",
+      "shortSummary": "Quick summary"
+    },
+    "empty": {
+      "previousExpense": "No expense data in previous period.",
+      "currentExpense": "No expense data in current period.",
+      "previousIncome": "No income data in previous period.",
+      "currentIncome": "No income data in current period.",
+      "period": "No income or expense transactions in selected period."
+    },
+    "change": {
+      "new": "New",
+      "equal": "{{name}} stayed at the same level as previous period.",
+      "appeared": "{{name}} did not exist in previous period and appeared in current period.",
+      "increased": "{{name}} increased by {{percent}}% (+{{delta}}).",
+      "decreased": "{{name}} decreased by {{percent}}% (-{{delta}})."
+    },
+    "summary": {
+      "topExpense": "Top expense category: {{name}} ({{amount}}).",
+      "topExpenseMissing": "Top expense category: no data.",
+      "topIncome": "Top income source: {{name}} ({{amount}}).",
+      "topIncomeMissing": "Top income source: no data.",
+      "increasedExpenseCategory": "Most increased expense category: {{name}} (+{{amount}}).",
+      "increasedExpenseCategoryMissing": "Most increased expense category: not identified.",
+      "decreasedIncomeSource": "Most decreased income source: {{name}} (-{{amount}}).",
+      "decreasedIncomeSourceMissing": "Most decreased income source: not identified."
+    },
+    "errors": {
+      "load": "Failed to load report"
+    }
+  },
+  "accounts": {
+    "summaryTitle": "Total balance (UZS)",
+    "count": "{{count}} accounts",
+    "balance": "Balance",
+    "newAccount": "New account",
+    "editAccount": "Edit account",
+    "createAccount": "New account",
+    "fields": {
+      "name": "Account name",
+      "namePlaceholder": "For example: Main card",
+      "type": "Account type",
+      "currency": "Currency",
+      "initialBalance": "Initial balance"
+    },
+    "types": {
+      "CASH": "Cash",
+      "BANK_CARD": "Bank card",
+      "SAVINGS": "Savings"
+    },
+    "delete": {
+      "title": "Delete account",
+      "text": "Are you sure you want to delete \"{{name}}\" account?"
+    },
+    "toasts": {
+      "nameRequired": "Please enter account name!",
+      "updated": "Updated",
+      "created": "Account created",
+      "deleted": "Deleted",
+      "loadError": "Failed to load accounts"
+    }
+  },
+  "analytics": {
+    "cards": {
+      "income": "Total income",
+      "expense": "Total expense",
+      "net": "Net balance"
+    },
+    "incomeExpense": "Income and Expense",
+    "expenseDistribution": "Expense distribution",
+    "topCategories": "Top categories",
+    "noData": "No data",
+    "emptyPrompt": "Add transactions for analytics",
+    "spent": "Spent"
+  },
+  "budget": {
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "empty": "No limits set for this month",
+    "family": {
+      "activeTitle": "Family budget is active",
+      "activeText": "These limits are shared across {{count}} members in \"{{name}}\".",
+      "personalTitle": "Personal budget",
+      "personalText": "These limits currently apply only to your personal profile."
+    },
+    "status": {
+      "over": "Exceeded",
+      "danger": "Critical",
+      "warn": "Caution",
+      "good": "Good"
+    },
+    "remaining": "{{amount}} left",
+    "exceeded": "{{amount}} exceeded",
+    "addLimit": "Add limit",
+    "addLimitTitle": "Add limit",
+    "fields": {
+      "category": "Category",
+      "monthlyLimit": "Monthly limit (UZS)",
+      "monthlyLimitPlaceholder": "For example: 500000"
+    },
+    "allCategoriesUsed": "All categories already have limits",
+    "toasts": {
+      "required": "Please enter category and limit!",
+      "added": "Limit added",
+      "deleted": "Deleted",
+      "loadError": "Failed to load budget"
+    }
+  },
+  "debts": {
+    "summary": {
+      "lent": "I lent",
+      "borrowed": "I borrowed"
+    },
+    "tabs": {
+      "lent": "I lent",
+      "borrowed": "I borrowed"
+    },
+    "add": "Add",
+    "empty": {
+      "lent": "No lent debts",
+      "borrowed": "No borrowed debts"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "close": "Close",
+    "newDebt": "New debt",
+    "fields": {
+      "personName": "Person name",
+      "amount": "Amount",
+      "currency": "Currency",
+      "dueDate": "Due date (optional)",
+      "description": "Description (optional)",
+      "personPlaceholder": "For example: Alex",
+      "descriptionPlaceholder": "For example: Apartment repair"
+    },
+    "delete": {
+      "title": "Delete debt",
+      "text": "Are you sure to delete debt with \"{{name}}\"?"
+    },
+    "toasts": {
+      "required": "Please enter name and amount!",
+      "lentAdded": "Debt lent",
+      "borrowedAdded": "Debt borrowed",
+      "closed": "Debt closed",
+      "deleted": "Deleted",
+      "loadError": "Failed to load debts"
+    }
+  },
+  "transfers": {
+    "quick": "Quick transfer",
+    "accountsCount": "{{count}} accounts available",
+    "new": "Transfer",
+    "history": "History",
+    "empty": "No transfers found",
+    "newTitle": "New transfer",
+    "fields": {
+      "from": "From",
+      "to": "To",
+      "amount": "Amount",
+      "exchangeRate": "Exchange rate (1 {{from}} = ? {{to}})",
+      "sending": "Sending",
+      "receiving": "Receiving",
+      "date": "Date",
+      "note": "Note",
+      "notePlaceholder": "Optional...",
+      "rate": "Rate: 1 {{from}} = {{rate}} {{to}}",
+      "autoRate": "Auto rate: 1 {{from}} = {{rate}} {{to}}",
+      "afterTransfer": "Balance after transfer",
+      "fromAfter": "Sender account",
+      "toAfter": "Receiver account"
+    },
+    "submit": "Transfer",
+    "delete": {
+      "title": "Delete transfer",
+      "text": "Are you sure to delete transfer {{from}} -> {{to}}?"
+    },
+    "toasts": {
+      "needAccounts": "At least 2 accounts are required",
+      "invalidAmount": "Enter a valid amount",
+      "selectAccounts": "Select accounts",
+      "sameAccount": "Cannot transfer to the same account",
+      "invalidRate": "Invalid exchange rate",
+      "rateUnavailable": "Unable to calculate exchange rate",
+      "insufficientFunds": "Insufficient funds in sender account",
+      "success": "Transfer completed",
+      "deleted": "Transfer deleted",
+      "loadError": "Failed to load transfers"
+    }
+  },
+  "auth": {
+    "or": "Or",
+    "google": {
+      "unavailable": "Google login is not configured"
+    },
+    "login": {
+      "hero": "Take control of your personal finance.",
+      "financialMessage": "Manage income, spending, family budgets, and smart reports from one secure financial workspace.",
+      "features": {
+        "f1": "Real-time analytics",
+        "f2": "Multi-currency accounts",
+        "f3": "Budget limits",
+        "f4": "Debt management"
+      },
+      "welcome": "Welcome!",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "remember": "Remember me",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "No account?",
+      "goRegister": "Create one",
+      "toasts": {
+        "required": "Enter email and password",
+        "welcome": "Welcome, {{name}}!"
+      }
+    },
+    "register": {
+      "hero": "Your financial freedom starts here.",
+      "financialMessage": "Start with FinTrack and organize your finances from day one: accounts, budgets, and family control in one place.",
+      "features": {
+        "f1": "Free registration",
+        "f2": "Your data is protected",
+        "f3": "Access from any device",
+        "f4": "Start immediately"
+      },
+      "title": "Create account",
+      "subtitle": "Get started in one minute",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "password": "Password",
+      "passwordPlaceholder": "At least 6 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Re-enter password",
+      "submit": "Sign up",
+      "hasAccount": "Already have an account?",
+      "goLogin": "Sign in",
+      "toasts": {
+        "required": "Please fill all fields",
+        "minPassword": "Password must be at least 6 characters",
+        "passwordMismatch": "Passwords do not match",
+        "created": "Account created!"
+      }
+    },
+    "forgot": {
+      "title": "Reset password",
+      "description": "Enter your email and we will send you a secure link to create a new password.",
+      "heading": "Forgot your password?",
+      "subtitle": "We will send a reset link to your email address.",
+      "submit": "Send reset link",
+      "back": "Back to sign in",
+      "required": "Enter your email",
+      "sent": "Reset link sent"
+    },
+    "reset": {
+      "title": "Create a new password",
+      "description": "Set a fresh password and get secure access to your account again.",
+      "heading": "Set a new password",
+      "subtitle": "Choose a strong password and confirm it.",
+      "submit": "Save new password",
+      "required": "Fill in all fields",
+      "success": "Password updated successfully"
+    },
+    "error": "Error"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage app preferences",
+    "sections": {
+      "profile": "Profile",
+      "family": "Family sharing",
+      "personalization": "Personalization",
+      "aiReports": "AI reports",
+      "language": "Language",
+      "currency": "Currency",
+      "theme": "Theme",
+      "notifications": "Notifications",
+      "security": "Security",
+      "ai": "AI settings",
+      "account": "Account",
+      "danger": "Danger zone"
+    },
+    "profile": {
+      "title": "Profile details",
+      "description": "Update username and email.",
+      "username": "Username",
+      "usernamePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "save": "Save profile",
+      "required": "Enter username and email",
+      "saved": "Profile updated",
+      "loadError": "Failed to load profile"
+    },
+    "family": {
+      "title": "Family sharing",
+      "description": "Owner gets a unique code, members join the group with that code.",
+      "groupName": "Group name",
+      "joinCodeTitle": "Unique join code",
+      "joinCodeHint": "Only users with this code can join your group.",
+      "copyCode": "Copy code",
+      "regenerateCode": "Regenerate code",
+      "codeCopied": "Code copied",
+      "copyError": "Failed to copy code",
+      "codeRegenerated": "New code generated",
+      "codeRegenerateError": "Failed to regenerate code",
+      "joinByCodeTitle": "Join by code",
+      "joinCodePlaceholder": "Example: FT-ABC123...",
+      "joinAction": "Join group",
+      "joinCodeRequired": "Enter join code",
+      "joinSuccess": "Joined group successfully",
+      "joinError": "Failed to join with code",
+      "membersTitle": "Members",
+      "noMembers": "No members yet",
+      "roleOwner": "Owner",
+      "roleMember": "Member",
+      "removeAction": "Remove",
+      "memberRemoved": "Member removed",
+      "removeError": "Failed to remove member",
+      "loadError": "Failed to load family data"
+    },
+    "password": {
+      "title": "Change password",
+      "description": "After saving a new password, old password login will not work.",
+      "current": "Current password",
+      "next": "New password",
+      "confirm": "Confirm new password",
+      "save": "Update password",
+      "required": "Fill all password fields",
+      "mismatch": "New passwords do not match",
+      "updated": "Password updated"
+    },
+    "notifications": {
+      "budgetWarning": "Budget warning",
+      "highSpending": "High spending alert",
+      "monthlyReminder": "Monthly report reminder"
+    },
+    "aiReports": {
+      "title": "AI report schedule",
+      "description": "AI works in the background and sends a report at your selected time.",
+      "enabled": "Enable AI reports",
+      "period": "Report period",
+      "time": "Delivery time",
+      "timezone": "Time zone",
+      "language": "Report language",
+      "save": "Save AI settings",
+      "test": "Send test report",
+      "testSent": "Test report sent",
+      "saved": "AI settings saved",
+      "loadError": "Failed to load AI settings",
+      "apiMissing": "OpenRouter API key is missing. Add OPENROUTER_API_KEY in backend .env."
+    },
+    "ai": {
+      "toggle": "Enable AI advice",
+      "hint": "Reserved for future AI recommendations."
+    },
+    "account": {
+      "title": "Account",
+      "description": "Current account details and logout.",
+      "name": "User",
+      "email": "Email",
+      "logout": "Log out"
+    },
+    "danger": {
+      "clearAll": "Clear all data",
+      "hint": "This action cannot be undone.",
+      "confirmTitle": "Delete all data",
+      "confirmText": "Accounts, transactions, debts, transfers, and budgets will be removed. Continue?",
+      "confirmAction": "Yes, clear data"
+    },
+    "saved": "Setting saved",
+    "cleared": "Data cleared",
+    "clearFailed": "Failed to clear data"
+  }
+}

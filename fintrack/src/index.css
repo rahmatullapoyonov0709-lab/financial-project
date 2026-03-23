@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #EEF2FF;
+  --color-primary-100: #E0E7FF;
+  --color-primary-400: #818CF8;
+  --color-primary-500: #6366F1;
+  --color-primary-600: #4F46E5;
+  --color-success-50: #ECFDF5;
+  --color-success-500: #10B981;
+  --color-success-600: #059669;
+  --color-danger-50: #FEF2F2;
+  --color-danger-500: #EF4444;
+  --color-danger-600: #DC2626;
+  --color-warning-50: #FFFBEB;
+  --color-warning-500: #F59E0B;
+  --color-warning-600: #D97706;
+  --color-dark-700: #1E293B;
+  --color-dark-800: #0F172A;
+  --color-dark-900: #020617;
+}
+
+* { box-sizing: border-box; }
+
+button,
+a,
+select,
+summary,
+[role="button"],
+[role="switch"] {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+html, body {
+  background-color: #020617;
+  color: #F1F5F9;
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+input, select, textarea {
+  color: #F1F5F9;
+  background-color: #0F172A;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+
+@keyframes slideUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Remove number input arrows */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number]{ appearance: textfield; }
+
+html.theme-dark {
+  color-scheme: dark;
+}
+
+html.theme-light {
+  color-scheme: light;
+  color: #0F172A;
+}
+
+html.theme-light,
+html.theme-light body {
+  background-color: #F1F5F9;
+  color: #0F172A;
+}
+
+html.theme-light .bg-dark-900,
+html.theme-light [class*="bg-dark-900/"] {
+  background-color: #F8FAFC !important;
+}
+
+html.theme-light .bg-dark-800,
+html.theme-light [class*="bg-dark-800/"] {
+  background-color: #FFFFFF !important;
+}
+
+html.theme-light .bg-dark-700,
+html.theme-light [class*="bg-dark-700/"] {
+  background-color: #E2E8F0 !important;
+}
+
+html.theme-light .bg-gray-800,
+html.theme-light [class*="bg-gray-800/50"] {
+  background-color: #E2E8F0 !important;
+}
+
+html.theme-light .bg-gray-700,
+html.theme-light [class*="bg-gray-700/50"] {
+  background-color: rgba(226, 232, 240, 0.9) !important;
+}
+
+html.theme-light [class*="bg-gray-700/30"] {
+  background-color: rgba(226, 232, 240, 0.7) !important;
+}
+
+html.theme-light [class*="border-gray-700"] {
+  border-color: #CBD5E1 !important;
+}
+
+html.theme-light [class*="border-gray-800"] {
+  border-color: #E2E8F0 !important;
+}
+
+html.theme-light .text-white {
+  color: #0F172A !important;
+}
+
+html.theme-light .text-gray-100 {
+  color: #1E293B !important;
+}
+
+html.theme-light .text-gray-200 {
+  color: #334155 !important;
+}
+
+html.theme-light .text-gray-300 {
+  color: #475569 !important;
+}
+
+html.theme-light .text-gray-400 {
+  color: #64748B !important;
+}
+
+html.theme-light .text-gray-500 {
+  color: #64748B !important;
+}
+
+html.theme-light .text-gray-600 {
+  color: #94A3B8 !important;
+}
+
+html.theme-light .text-primary-400 {
+  color: #4F46E5 !important;
+}
+
+html.theme-light .hover\:text-white:hover {
+  color: #0F172A !important;
+}
+
+html.theme-light [class*="bg-primary-"].text-white,
+html.theme-light [class*="bg-success-"].text-white,
+html.theme-light [class*="bg-danger-"].text-white,
+html.theme-light [class*="bg-warning-"].text-white,
+html.theme-light [class*="bg-purple-"].text-white,
+html.theme-light .bg-gradient-to-br.text-white,
+html.theme-light .bg-gradient-to-r.text-white {
+  color: #FFFFFF !important;
+}
+
+html.theme-light .placeholder-gray-600::placeholder {
+  color: #94A3B8 !important;
+}
+
+html.theme-light input,
+html.theme-light select,
+html.theme-light textarea {
+  background-color: #FFFFFF;
+  color: #0F172A;
+}
+
+html.theme-light select option {
+  color: #0F172A;
+  background-color: #FFFFFF;
+}
+
+.recharts-wrapper,
+.recharts-surface {
+  background: transparent !important;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+html.theme-dark .recharts-default-tooltip {
+  background-color: #0F172A !important;
+  border-color: #334155 !important;
+}
+
+html.theme-light .recharts-default-tooltip {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+}

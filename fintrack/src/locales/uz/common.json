@@ -1,0 +1,608 @@
+﻿{
+  "app": {
+    "name": "FinTrack",
+    "tagline": "Moliyaviy boshqaruv",
+    "titles": {
+      "dashboard": "Dashboard",
+      "accounts": "Hisoblar",
+      "transactions": "Tranzaksiyalar",
+      "transfers": "O'tkazmalar",
+      "debts": "Qarzlar",
+      "budget": "Byudjet",
+    "analytics": "Analitika",
+    "report": "Hisobot",
+    "family": "Oila",
+    "notifications": "Xabarlar",
+    "settings": "Sozlamalar"
+  }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "accounts": "Hisoblar",
+    "transactions": "Tranzaksiyalar",
+    "transfers": "O'tkazmalar",
+    "debts": "Qarzlar",
+    "budget": "Byudjet",
+    "analytics": "Analitika",
+    "report": "Hisobot",
+    "family": "Oila",
+    "notifications": "Xabarlar",
+    "settings": "Sozlamalar",
+    "home": "Bosh",
+    "actions": "Amallar",
+    "analysis": "Tahlil",
+    "more": "Ko'proq"
+  },
+  "header": {
+    "notifications": "Bildirishnomalar"
+  },
+  "notifications": {
+    "title": "Xabarlar",
+    "subtitle": "O'qilmagan: {{count}}",
+    "markAll": "Barchasini o'qilgan qilish",
+    "markOne": "O'qildi",
+    "markedAll": "Barcha xabarlar o'qilgan deb belgilandi",
+    "deleted": "Xabar o'chirildi",
+    "deleteError": "Xabarni o'chirishda xatolik",
+    "empty": "Hozircha xabarlar yo'q",
+    "loadError": "Xabarlarni yuklashda xatolik",
+    "markReadError": "Xabarni yangilashda xatolik"
+  },
+  "sidebar": {
+    "collapse": "Yon panelni yig'ish",
+    "expand": "Yon panelni ochish"
+  },
+  "common": {
+    "all": "Barchasi",
+    "cancel": "Bekor",
+    "save": "Saqlash",
+    "create": "Yaratish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "loading": "Yuklanmoqda...",
+    "unknown": "Noma'lum",
+    "noData": "Ma'lumot yo'q",
+    "comingSoon": "Tez orada",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "select": "Tanlang..."
+  },
+  "language": {
+    "label": "Til",
+    "uz": "O'zbekcha",
+    "en": "English",
+    "ru": "Русский"
+  },
+  "currency": {
+    "label": "Valyuta",
+    "uzs": "So'm",
+    "usd": "AQSH dollari",
+    "eur": "Yevro",
+    "rub": "Rubl"
+  },
+  "theme": {
+    "label": "Mavzu",
+    "dark": "Qorong'i",
+    "light": "Yorug'"
+  },
+  "categories": {
+    "system": {
+      "food": "Oziq-ovqat",
+      "transport": "Transport",
+      "utilities": "Kommunal",
+      "health": "Sog'liq",
+      "clothes": "Kiyim",
+      "restaurant": "Restoran",
+      "entertainment": "Ko'ngil ochar",
+      "education": "Ta'lim",
+      "communication": "Aloqa",
+      "travel": "Sayohat",
+      "other": "Boshqa",
+      "salary": "Ish haqi",
+      "freelance": "Frilanserlik",
+      "investment": "Investitsiya",
+      "otherIncome": "Boshqa daromad"
+    }
+  },
+  "household": {
+    "invite": {
+      "pending": "Sizga oilaviy guruh taklifi yuborilgan. Kirganingizdan so'ng avtomatik qo'shilasiz."
+    },
+    "toasts": {
+      "inviteAccepted": "Taklif qabul qilindi{{name}}",
+      "inviteAcceptError": "Taklifni qabul qilishda xatolik"
+    }
+  },
+  "familyPage": {
+    "subtitle": "Oilaviy guruh endi umumiy moliyaviy maydon sifatida ishlaydi. A'zolar qo'shilgach, hisoblar, tranzaksiyalar va hisobotlar birgalikda ko'rinadi.",
+    "refresh": "Yangilash",
+    "myRole": "Mening rolim",
+    "memberCount": "A'zolar soni",
+    "createdAt": "Yaratilgan sana",
+    "soloTitle": "Hozircha siz yolg'izsiz",
+    "soloDescription": "Oilaviy guruh yaratilgan, lekin hozircha unda faqat siz borsiz. Kodni ulashsangiz, boshqalar shu guruhga qo'shilib umumiy moliyani birga boshqaradi.",
+    "sharedTitle": "Umumiy ishlaydigan bo'limlar",
+    "sharedDescription": "Quyidagi bo'limlar oiladagi barcha a'zolar uchun bitta umumiy ma'lumot maydoni bo'lib ishlaydi.",
+    "joinMoveHint": "Agar boshqa oilaning kodini kiritsangiz, shu guruhga o'tasiz va ma'lumot scope'i o'sha oila bo'yicha ishlaydi.",
+    "ownerLockedHint": "Siz owner ekansiz va guruhda boshqa a'zolar bor. Boshqa oilaga o'tishdan oldin a'zolarni chiqarish kerak.",
+    "membersDescription": "Owner a'zolarni boshqaradi, a'zolar esa umumiy moliyaviy ma'lumot bilan ishlaydi.",
+    "sharedItems": {
+      "accounts": "Hisoblar va balanslar",
+      "transactions": "Tranzaksiyalar tarixi",
+      "analytics": "Analitika va hisobotlar",
+      "report": "Hisobot sahifasi",
+      "budget": "Byudjet va limitlar",
+      "debts": "Qarzlar va majburiyatlar"
+    }
+  },
+  "dashboard": {
+    "greeting": "Salom,",
+    "expenseAction": "Xarajat",
+    "incomeAction": "Daromad",
+    "transferAction": "Transfer",
+    "stats": {
+      "totalBalance": "Jami balans",
+      "income": "Daromad",
+      "expense": "Xarajat",
+      "transactions": "Tranzaksiyalar",
+      "count": "{{count}} ta"
+    },
+    "monthlyDynamics": "Oylik dinamika",
+    "noTransactionsYet": "Hali tranzaksiya yo'q",
+    "accounts": "Hisoblar",
+    "viewAll": "Barchasi",
+    "noAccounts": "Hisob yo'q",
+    "recentTransactions": "So'nggi amallar",
+    "budget": "Byudjet",
+    "noBudget": "Byudjet belgilanmagan",
+    "family": {
+      "activeTitle": "Oilaviy moliya rejimi faol",
+      "activeText": "\"{{name}}\" oilasida {{count}} a'zo bilan umumiy byudjet va hisobot ishlayapti.",
+      "personalTitle": "Shaxsiy moliya rejimi",
+      "personalText": "Hozircha bu profil shaxsiy rejimda. Oila qo'shilsa byudjet va hisobot umumiy bo'ladi.",
+      "openFamily": "Oilani ochish",
+      "openBudget": "Byudjetni ochish"
+    },
+    "used": "Sarflangan",
+    "limit": "Limit"
+  },
+  "transactions": {
+    "filters": {
+      "all": "Barchasi",
+      "income": "Daromad",
+      "expense": "Xarajat"
+    },
+    "new": "Yangi",
+    "emptyTitle": "Hali tranzaksiya yo'q",
+    "addFirst": "+ Birinchisini qo'shing",
+    "newTransaction": "Yangi tranzaksiya",
+    "type": "Turi",
+    "amount": "Summa",
+    "account": "Hisob",
+    "category": "Kategoriya",
+    "description": "Izoh (ixtiyoriy)",
+    "descriptionPlaceholder": "Masalan: Haftalik bozor",
+    "date": "Sana",
+    "select": "Tanlang...",
+    "add": "Qo'shish",
+    "requiredFields": "Barcha maydonlarni to'ldiring!",
+    "incomeAdded": "Daromad qo'shildi",
+    "expenseAdded": "Xarajat qo'shildi",
+    "deleted": "O'chirildi",
+    "loadError": "Tranzaksiyalarni yuklashda xatolik",
+    "categoryAccountDate": "{{account}} · {{description}} · {{date}}"
+  },
+  "report": {
+    "periods": {
+      "daily": "Kunlik",
+      "weekly": "Haftalik",
+      "monthly": "Oylik",
+      "yearly": "Yillik"
+    },
+    "previousPeriod": "Oldingi davr",
+    "currentPeriod": "Joriy davr",
+    "cards": {
+      "totalIncome": "Jami daromad",
+      "totalExpense": "Jami xarajat",
+      "netResult": "Sof natija",
+      "topExpense": "Eng katta xarajat",
+      "topIncome": "Eng katta daromad",
+      "noInfo": "Ma'lumot yo'q"
+    },
+    "sections": {
+      "expenses": "Xarajatlar",
+      "incomes": "Daromadlar",
+      "previousExpenses": "Oldingi davr xarajatlari",
+      "currentExpenses": "Joriy davr xarajatlari",
+      "previousIncomes": "Oldingi davr daromadlari",
+      "currentIncomes": "Joriy davr daromadlari",
+      "shortSummary": "Qisqa xulosa"
+    },
+    "empty": {
+      "previousExpense": "Oldingi davrda xarajat ma'lumotlari topilmadi.",
+      "currentExpense": "Joriy davrda xarajat ma'lumotlari topilmadi.",
+      "previousIncome": "Oldingi davrda daromad ma'lumotlari topilmadi.",
+      "currentIncome": "Joriy davrda daromad ma'lumotlari topilmadi.",
+      "period": "Tanlangan davrda daromad yoki xarajat tranzaksiyasi topilmadi."
+    },
+    "change": {
+      "new": "Yangi",
+      "equal": "{{name}} oldingi davr bilan bir xil darajada qolgan.",
+      "appeared": "{{name}} oldingi davrda yo'q edi, joriy davrda paydo bo'lgan.",
+      "increased": "{{name}} {{percent}}% ga oshgan (+{{delta}}).",
+      "decreased": "{{name}} {{percent}}% ga kamaygan (-{{delta}})."
+    },
+    "summary": {
+      "topExpense": "Eng katta xarajat kategoriyasi: {{name}} ({{amount}}).",
+      "topExpenseMissing": "Eng katta xarajat kategoriyasi: ma'lumot yo'q.",
+      "topIncome": "Eng katta daromad manbai: {{name}} ({{amount}}).",
+      "topIncomeMissing": "Eng katta daromad manbai: ma'lumot yo'q.",
+      "increasedExpenseCategory": "Ko'proq oshgan xarajat kategoriyasi: {{name}} (+{{amount}}).",
+      "increasedExpenseCategoryMissing": "Ko'proq oshgan xarajat kategoriyasi: aniqlanmadi.",
+      "decreasedIncomeSource": "Ko'proq kamaygan daromad manbai: {{name}} (-{{amount}}).",
+      "decreasedIncomeSourceMissing": "Ko'proq kamaygan daromad manbai: aniqlanmadi."
+    },
+    "errors": {
+      "load": "Hisobotni yuklashda xatolik"
+    }
+  },
+  "accounts": {
+    "summaryTitle": "Jami balans (UZS)",
+    "count": "{{count}} ta hisob",
+    "balance": "Balans",
+    "newAccount": "Yangi hisob",
+    "editAccount": "Hisobni tahrirlash",
+    "createAccount": "Yangi hisob",
+    "fields": {
+      "name": "Hisob nomi",
+      "namePlaceholder": "Masalan: Asosiy karta",
+      "type": "Hisob turi",
+      "currency": "Valyuta",
+      "initialBalance": "Boshlang'ich balans"
+    },
+    "types": {
+      "CASH": "Naqd pul",
+      "BANK_CARD": "Bank karta",
+      "SAVINGS": "Jamg'arma"
+    },
+    "delete": {
+      "title": "Hisobni o'chirish",
+      "text": "\"{{name}}\" hisobini o'chirmoqchimisiz?"
+    },
+    "toasts": {
+      "nameRequired": "Hisob nomini kiriting!",
+      "updated": "Yangilandi",
+      "created": "Hisob yaratildi",
+      "deleted": "O'chirildi",
+      "loadError": "Hisoblarni yuklashda xatolik"
+    }
+  },
+  "analytics": {
+    "cards": {
+      "income": "Jami daromad",
+      "expense": "Jami xarajat",
+      "net": "Sof balans"
+    },
+    "incomeExpense": "Daromad va Xarajat",
+    "expenseDistribution": "Xarajat taqsimoti",
+    "topCategories": "Top kategoriyalar",
+    "noData": "Ma'lumot yo'q",
+    "emptyPrompt": "Tahlil uchun tranzaksiya qo'shing",
+    "spent": "Sarflangan"
+  },
+  "budget": {
+    "months": {
+      "1": "Yanvar",
+      "2": "Fevral",
+      "3": "Mart",
+      "4": "Aprel",
+      "5": "May",
+      "6": "Iyun",
+      "7": "Iyul",
+      "8": "Avgust",
+      "9": "Sentabr",
+      "10": "Oktabr",
+      "11": "Noyabr",
+      "12": "Dekabr"
+    },
+    "empty": "Bu oy uchun limit belgilanmagan",
+    "family": {
+      "activeTitle": "Oilaviy byudjet ishlayapti",
+      "activeText": "\"{{name}}\" oilasida bu limitlar {{count}} a'zo uchun umumiy ishlaydi.",
+      "personalTitle": "Shaxsiy byudjet",
+      "personalText": "Bu limitlar hozircha faqat sizning profilingiz uchun ishlayapti."
+    },
+    "status": {
+      "over": "Oshib ketdi",
+      "danger": "Xavfli",
+      "warn": "Ehtiyot",
+      "good": "Yaxshi"
+    },
+    "remaining": "{{amount}} qoldi",
+    "exceeded": "{{amount}} oshdi",
+    "addLimit": "Limit qo'shish",
+    "addLimitTitle": "Limit qo'shish",
+    "fields": {
+      "category": "Kategoriya",
+      "monthlyLimit": "Oylik limit (UZS)",
+      "monthlyLimitPlaceholder": "Masalan: 500000"
+    },
+    "allCategoriesUsed": "Barcha kategoriyalarga limit belgilangan",
+    "toasts": {
+      "required": "Kategoriya va limitni kiriting!",
+      "added": "Limit qo'shildi",
+      "deleted": "O'chirildi",
+      "loadError": "Byudjetni yuklashda xatolik"
+    }
+  },
+  "debts": {
+    "summary": {
+      "lent": "Men berdim",
+      "borrowed": "Men oldim"
+    },
+    "tabs": {
+      "lent": "Men berdim",
+      "borrowed": "Men oldim"
+    },
+    "add": "Qo'shish",
+    "empty": {
+      "lent": "Berilgan qarz yo'q",
+      "borrowed": "Olingan qarz yo'q"
+    },
+    "status": {
+      "open": "Ochiq",
+      "closed": "Yopilgan"
+    },
+    "close": "Yopish",
+    "newDebt": "Yangi qarz",
+    "fields": {
+      "personName": "Shaxs ismi",
+      "amount": "Summa",
+      "currency": "Valyuta",
+      "dueDate": "Qaytarish muddati (ixtiyoriy)",
+      "description": "Izoh (ixtiyoriy)",
+      "personPlaceholder": "Masalan: Alisher",
+      "descriptionPlaceholder": "Masalan: Kvartira tamiri"
+    },
+    "delete": {
+      "title": "Qarzni o'chirish",
+      "text": "\"{{name}}\" bilan qarzni o'chirmoqchimisiz?"
+    },
+    "toasts": {
+      "required": "Ism va summani kiriting!",
+      "lentAdded": "Qarz berildi",
+      "borrowedAdded": "Qarz olindi",
+      "closed": "Qarz yopildi",
+      "deleted": "O'chirildi",
+      "loadError": "Qarzlarni yuklashda xatolik"
+    }
+  },
+  "transfers": {
+    "quick": "Tez o'tkazma",
+    "accountsCount": "{{count}} ta hisob mavjud",
+    "new": "O'tkazma",
+    "history": "Tarix",
+    "empty": "O'tkazma topilmadi",
+    "newTitle": "Yangi o'tkazma",
+    "fields": {
+      "from": "Qayerdan",
+      "to": "Qayerga",
+      "amount": "Summa",
+      "exchangeRate": "Valyuta kursi (1 {{from}} = ? {{to}})",
+      "sending": "Jo'natiladi",
+      "receiving": "Qabul qilinadi",
+      "date": "Sana",
+      "note": "Izoh",
+      "notePlaceholder": "Ixtiyoriy...",
+      "rate": "Kurs: 1 {{from}} = {{rate}} {{to}}",
+      "autoRate": "Avto kurs: 1 {{from}} = {{rate}} {{to}}",
+      "afterTransfer": "Transferdan keyingi balans",
+      "fromAfter": "Yechilgandan keyin",
+      "toAfter": "Qo'shilgandan keyin"
+    },
+    "submit": "O'tkazish",
+    "delete": {
+      "title": "O'tkazmani o'chirish",
+      "text": "{{from}} -> {{to}} o'tkazmasini o'chirmoqchimisiz?"
+    },
+    "toasts": {
+      "needAccounts": "Kamida 2 ta hisob bo'lishi kerak",
+      "invalidAmount": "Summani to'g'ri kiriting",
+      "selectAccounts": "Hisoblarni tanlang",
+      "sameAccount": "Bir xil hisobga o'tkazma qilib bo'lmaydi",
+      "invalidRate": "Valyuta kursi to'g'ri emas",
+      "rateUnavailable": "Valyuta kursini hisoblab bo'lmadi",
+      "insufficientFunds": "Jo'natuvchi hisobda mablag' yetarli emas",
+      "success": "O'tkazma amalga oshirildi",
+      "deleted": "O'tkazma o'chirildi",
+      "loadError": "O'tkazmalarni yuklashda xatolik"
+    }
+  },
+  "auth": {
+    "or": "Yoki",
+    "google": {
+      "unavailable": "Google login sozlanmagan"
+    },
+    "login": {
+      "hero": "Shaxsiy moliyangizni nazorat qiling.",
+      "financialMessage": "Daromad, xarajat, oila budjeti va aqlli hisobotlarni bitta xavfsiz moliyaviy markazda boshqaring.",
+      "features": {
+        "f1": "Real-time analitika",
+        "f2": "Ko'p valyutali hisoblar",
+        "f3": "Byudjet limiti",
+        "f4": "Qarz boshqaruvi"
+      },
+      "welcome": "Xush kelibsiz!",
+      "subtitle": "Hisobingizga kiring",
+      "email": "Email",
+      "password": "Parol",
+      "passwordPlaceholder": "Parolingiz",
+      "remember": "Eslab qolish",
+      "forgot": "Parol esdan chiqdimi?",
+      "submit": "Kirish",
+      "noAccount": "Hisob yo'qmi?",
+      "goRegister": "Ro'yxatdan o'ting",
+      "toasts": {
+        "required": "Email va parol kiriting",
+        "welcome": "Xush kelibsiz, {{name}}!"
+      }
+    },
+    "register": {
+      "hero": "Moliyaviy erkinligingiz shu yerdan boshlanadi.",
+      "financialMessage": "FinTrack bilan birinchi kundanoq moliyangizni tartibga soling: hisoblar, budjetlar va oilaviy nazorat bitta joyda.",
+      "features": {
+        "f1": "Bepul ro'yxatdan o'tish",
+        "f2": "Ma'lumotlaringiz himoyada",
+        "f3": "Istalgan qurilmadan kirish",
+        "f4": "Darhol foydalanish mumkin"
+      },
+      "title": "Hisob yaratish",
+      "subtitle": "Bir daqiqada boshlang",
+      "name": "Ism",
+      "namePlaceholder": "Ismingiz",
+      "email": "Email",
+      "password": "Parol",
+      "passwordPlaceholder": "Kamida 6 belgi",
+      "confirmPassword": "Parolni tasdiqlang",
+      "confirmPlaceholder": "Parolni qayta kiriting",
+      "submit": "Ro'yxatdan o'tish",
+      "hasAccount": "Hisob bormi?",
+      "goLogin": "Kirish",
+      "toasts": {
+        "required": "Barcha maydonlarni to'ldiring",
+        "minPassword": "Parol kamida 6 belgi bo'lishi kerak",
+        "passwordMismatch": "Parollar mos emas",
+        "created": "Hisob yaratildi!"
+      }
+    },
+    "forgot": {
+      "title": "Parolni tiklash",
+      "description": "Email manzilingizni kiriting, biz sizga yangi parol yaratish havolasini yuboramiz.",
+      "heading": "Parolni unutdingizmi?",
+      "subtitle": "Kirish uchun emailingizga tiklash linki yuboriladi.",
+      "submit": "Tiklash havolasini yuborish",
+      "back": "Kirishga qaytish",
+      "required": "Email kiriting",
+      "sent": "Tiklash havolasi yuborildi"
+    },
+    "reset": {
+      "title": "Parolni yangilash",
+      "description": "Yangi parol o'rnating va akkauntingizga xavfsiz qayta kiring.",
+      "heading": "Yangi parol yarating",
+      "subtitle": "Kuchli parol tanlang va uni tasdiqlang.",
+      "submit": "Yangi parolni saqlash",
+      "required": "Barcha maydonlarni to'ldiring",
+      "success": "Parol muvaffaqiyatli yangilandi"
+    },
+    "error": "Xato"
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "description": "Ilova sozlamalarini boshqaring",
+    "sections": {
+      "profile": "Profil",
+      "family": "Oila ulashish",
+      "personalization": "Personalizatsiya",
+      "aiReports": "AI hisobotlar",
+      "language": "Til",
+      "currency": "Valyuta",
+      "theme": "Mavzu",
+      "notifications": "Bildirishnomalar",
+      "security": "Xavfsizlik",
+      "ai": "AI sozlamalari",
+      "account": "Akkaunt",
+      "danger": "Xavfli zona"
+    },
+    "profile": {
+      "title": "Profil ma'lumotlari",
+      "description": "Username va emailni yangilang.",
+      "username": "Username",
+      "usernamePlaceholder": "Ismingiz",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "save": "Profilni saqlash",
+      "required": "Username va emailni kiriting",
+      "saved": "Profil yangilandi",
+      "loadError": "Profilni yuklashda xatolik"
+    },
+    "family": {
+      "title": "Oila bilan ulashish",
+      "description": "Owner yagona kod yaratadi, a'zolar shu kod orqali guruhga qo'shiladi.",
+      "groupName": "Guruh nomi",
+      "joinCodeTitle": "Yagona qo'shilish kodi",
+      "joinCodeHint": "Kodni ulashgan odamlargina guruhga qo'shila oladi.",
+      "copyCode": "Koddan nusxa olish",
+      "regenerateCode": "Kodni yangilash",
+      "codeCopied": "Kod nusxalandi",
+      "copyError": "Koddan nusxa olib bo'lmadi",
+      "codeRegenerated": "Yangi kod yaratildi",
+      "codeRegenerateError": "Kodni yangilashda xatolik",
+      "joinByCodeTitle": "Kod orqali qo'shilish",
+      "joinCodePlaceholder": "Masalan: FT-ABC123...",
+      "joinAction": "Qo'shilish",
+      "joinCodeRequired": "Qoshilish kodini kiriting",
+      "joinSuccess": "Guruhga muvaffaqiyatli qo'shildingiz",
+      "joinError": "Kod bo'yicha qo'shilishda xatolik",
+      "membersTitle": "A'zolar",
+      "noMembers": "Hozircha a'zolar yo'q",
+      "roleOwner": "Owner",
+      "roleMember": "A'zo",
+      "removeAction": "Chiqarish",
+      "memberRemoved": "A'zo chiqarildi",
+      "removeError": "A'zoni chiqarishda xatolik",
+      "loadError": "Oila ma'lumotlarini yuklashda xatolik"
+    },
+    "password": {
+      "title": "Parolni o'zgartirish",
+      "description": "Yangi parol saqlangandan keyin eski parol bilan kirib bo'lmaydi.",
+      "current": "Joriy parol",
+      "next": "Yangi parol",
+      "confirm": "Yangi parolni tasdiqlang",
+      "save": "Parolni yangilash",
+      "required": "Barcha parol maydonlarini to'ldiring",
+      "mismatch": "Yangi parollar mos emas",
+      "updated": "Parol yangilandi"
+    },
+    "notifications": {
+      "budgetWarning": "Byudjet ogohlantirishi",
+      "highSpending": "Yuqori xarajat signali",
+      "monthlyReminder": "Oylik hisobot eslatmasi"
+    },
+    "aiReports": {
+      "title": "AI hisobot jadvali",
+      "description": "AI fon rejimida hisobot tayyorlab, belgilangan vaqtda xabar yuboradi.",
+      "enabled": "AI hisobotni yoqish",
+      "period": "Hisobot davri",
+      "time": "Xabar vaqti",
+      "timezone": "Vaqt zonasi",
+      "language": "Hisobot tili",
+      "save": "AI sozlamalarni saqlash",
+      "test": "Sinov xabari yuborish",
+      "testSent": "Sinov xabari yuborildi",
+      "saved": "AI sozlamalar saqlandi",
+      "loadError": "AI sozlamalarni yuklashda xatolik",
+      "apiMissing": "OpenRouter API kaliti topilmadi. Backend .env fayliga OPENROUTER_API_KEY qo'shing."
+    },
+    "ai": {
+      "toggle": "AI maslahatlarini yoqish",
+      "hint": "Kelajakdagi AI tavsiyalar uchun tayyor holat."
+    },
+    "account": {
+      "title": "Akkaunt",
+      "description": "Joriy akkaunt ma'lumotlari va chiqish.",
+      "name": "Foydalanuvchi",
+      "email": "Email",
+      "logout": "Chiqish"
+    },
+    "danger": {
+      "clearAll": "Barcha ma'lumotlarni tozalash",
+      "hint": "Bu amal qaytarib bo'lmaydi.",
+      "confirmTitle": "Barcha ma'lumotlarni o'chirish",
+      "confirmText": "Hisoblar, tranzaksiyalar, qarzlar, o'tkazmalar va byudjetlar o'chiriladi. Davom etasizmi?",
+      "confirmAction": "Ha, tozalash"
+    },
+    "saved": "Sozlama saqlandi",
+    "cleared": "Ma'lumotlar tozalandi",
+    "clearFailed": "Ma'lumotlarni tozalashda xatolik"
+  }
+}
