@@ -5,10 +5,14 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL topilmadi. .env ni tekshiring.');
 }
 
-const sslMode = (process.env.PGSSLMODE || (process.env.NODE_ENV === 'production' ? 'require' : 'disable')).toLowerCase();
+const sslMode = (
+  process.env.PGSSLMODE ||
+  (process.env.NODE_ENV === 'production' ? 'require' : 'disable')
+).toLowerCase();
+
 const shouldUseSSL = sslMode !== 'disable' && sslMode !== 'allow';
 
-const pool = new Pool({
+const poolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: 10,
   idleTimeoutMillis: 30000,
@@ -16,14 +20,15 @@ const pool = new Pool({
   query_timeout: Number.parseInt(process.env.PG_QUERY_TIMEOUT_MS || '15000', 10),
   keepAlive: true,
   application_name: process.env.PG_APP_NAME || 'fintrack-api',
-  ...(shouldUseSSL
-    ? {
-        ssl: {
-          rejectUnauthorized: process.env.PGSSL_REJECT_UNAUTHORIZED !== 'false',
-        },
-      }
-    : {}),
-});
+};
+
+if (shouldUseSSL) {
+  poolConfig.ssl = {
+    rejectUnauthorized: false,
+  };
+}
+
+const pool = new Pool(poolConfig);
 
 pool.on('error', (err) => {
   logger.error('db.pool_error', { error: err.message });
