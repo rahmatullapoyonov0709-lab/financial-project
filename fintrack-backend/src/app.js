@@ -17,6 +17,9 @@ const defaultAllowedOrigins = [
   'http://127.0.0.1:5173',
   'http://localhost:4173',
   'http://127.0.0.1:4173',
+  'https://financial-project-7qj3.vercel.app',
+  'https://financial-project-git-6ff294-rahmatullapoyonov0709-5108s-projects.vercel.app',
+  'https://financial-project-7qj3-cxazupe9i.vercel.app',
 ];
 const configuredOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
