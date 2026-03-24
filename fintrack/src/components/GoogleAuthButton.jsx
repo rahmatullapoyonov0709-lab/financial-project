@@ -6,62 +6,69 @@ import { useAppSettings } from "../context/AppSettingsContext";
 const GOOGLE_SCRIPT_ID = "fintrack-google-identity";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
-export default function GoogleAuthButton({
-  remember = true,
-  onSuccess,
-  type = "signin",
-}) {
+export default function GoogleAuthButton({ remember = true, onSuccess }) {
   const { t } = useAppSettings();
-  const containerRef = useRef(null);
+  const buttonRef = useRef(null);
   const rememberRef = useRef(remember);
-  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     rememberRef.current = remember;
   }, [remember]);
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) {
-      return;
-    }
+    if (!GOOGLE_CLIENT_ID || !buttonRef.current) return;
 
-    const renderButton = () => {
-      if (!window.google?.accounts?.id || !containerRef.current) {
-        return;
-      }
+    const initGoogle = () => {
+      if (!window.google?.accounts?.id || !buttonRef.current) return;
 
-      containerRef.current.innerHTML = "";
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: async (response) => {
+          if (!response?.credential) {
+            toast.error("Google credential kelmadi");
+            return;
+          }
+
+          setLoading(true);
           try {
             const res = await api.post("/auth/google", {
               credential: response.credential,
             });
+
             api.storeAuthSession(res.data, { remember: rememberRef.current });
             toast.success(
-              t("auth.login.toasts.welcome", { name: res.data.user.name }),
+              t("auth.login.toasts.welcome", { name: res.data.user.name })
             );
             onSuccess?.(res.data.user);
           } catch (error) {
-            toast.error(error.message || t("auth.error"));
+            toast.error(
+              error?.response?.data?.message ||
+                error?.message ||
+                "Google login xato"
+            );
+          } finally {
+            setLoading(false);
           }
         },
       });
-      window.google.accounts.id.renderButton(containerRef.current, {
+
+      buttonRef.current.innerHTML = "";
+
+      window.google.accounts.id.renderButton(buttonRef.current, {
+        type: "standard",
         theme: "outline",
         size: "large",
-        width: 320,
-        text: type === "signup" ? "signup_with" : "signin_with",
+        text: "signin_with",
         shape: "pill",
-        locale: "uz_UZ", // Force Uzbek language on the Google button
+        width: 320,
+        logo_alignment: "left",
       });
-      setReady(true);
     };
 
     const existing = document.getElementById(GOOGLE_SCRIPT_ID);
     if (existing) {
-      renderButton();
+      initGoogle();
       return;
     }
 
@@ -70,28 +77,31 @@ export default function GoogleAuthButton({
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
-    script.onload = renderButton;
+    script.onload = initGoogle;
     document.head.appendChild(script);
-  }, [onSuccess, t, type]);
+  }, [onSuccess, t]);
 
   if (!GOOGLE_CLIENT_ID) {
     return (
       <button
         type="button"
         disabled
-        className="w-full cursor-not-allowed rounded-2xl border border-gray-700 bg-dark-900 px-4 py-3 text-sm font-medium text-gray-500"
+        className="w-full cursor-not-allowed rounded-2xl border border-white/10 bg-dark-900/50 px-4 py-3.5 text-sm font-medium text-gray-500"
       >
-        {t("auth.google.unavailable")}
+        Google client id yo‘q
       </button>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <div
-        ref={containerRef}
-        className={`min-h-[44px] ${ready ? "" : "opacity-70"}`}
-      />
+    <div className="flex w-full justify-center">
+      {loading ? (
+        <div className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-white">
+          <div className="h-5 w-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+        </div>
+      ) : (
+        <div ref={buttonRef} />
+      )}
     </div>
   );
 }
