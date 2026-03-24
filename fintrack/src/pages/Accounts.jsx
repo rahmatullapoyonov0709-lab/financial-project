@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, X, Pencil, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api } from '../api'
@@ -13,8 +13,9 @@ const TYPE_CONFIG = {
 const CURRENCIES = ['UZS', 'USD', 'EUR', 'RUB']
 
 export default function Accounts() {
-  const { t, formatMoney, formatNumber } = useAppSettings()
+  const { t, formatMoney, formatNumber, currency } = useAppSettings()
   const [accounts, setAccounts] = useState([])
+  const [summary, setSummary] = useState({ totalBaseBalance: 0, baseCurrency: 'UZS' })
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -24,8 +25,13 @@ export default function Accounts() {
 
   const load = async () => {
     try {
-      const res = await api.get('/accounts')
+      const query = new URLSearchParams({ baseCurrency: currency }).toString()
+      const res = await api.get(`/accounts?${query}`)
       setAccounts(res.data.accounts)
+      setSummary({
+        totalBaseBalance: Number.parseFloat(res.data.totalBaseBalance || 0),
+        baseCurrency: res.data.baseCurrency || currency,
+      })
     } catch (error) {
       toast.error(error.message || t('accounts.toasts.loadError'))
     } finally {
@@ -35,7 +41,7 @@ export default function Accounts() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [currency])
 
   const openCreate = () => {
     setEditingId(null)
@@ -91,9 +97,7 @@ export default function Accounts() {
     }
   }
 
-  const totalUZS = accounts
-    .filter((account) => account.currency === 'UZS')
-    .reduce((sum, account) => sum + Number.parseFloat(account.balance), 0)
+  const totalBase = summary.totalBaseBalance || 0
 
   if (loading) {
     return <div className="p-6 flex justify-center"><div className="w-8 h-8 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" /></div>
@@ -103,7 +107,7 @@ export default function Accounts() {
     <div className="p-4 lg:p-6 space-y-6">
       <div className="bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl p-5 text-white">
         <p className="text-sm text-white/70 mb-1">{t('accounts.summaryTitle')}</p>
-        <p className="text-3xl font-bold font-mono">{formatMoney(totalUZS, { currency: 'UZS' })}</p>
+        <p className="text-3xl font-bold font-mono">{formatMoney(totalBase, { currency: summary.baseCurrency })}</p>
         <p className="text-sm text-white/70 mt-2">{t('accounts.count', { count: formatNumber(accounts.length) })}</p>
       </div>
 
@@ -129,6 +133,11 @@ export default function Accounts() {
                 </div>
                 <p className="text-xs text-gray-500 mb-1">{t('accounts.balance')}</p>
                 <p className="text-2xl font-bold font-mono text-white">{formatMoney(account.balance, { currency: account.currency })}</p>
+                {account.currency !== summary.baseCurrency && (
+                  <p className="mt-1 text-xs text-gray-400 font-mono">
+                    {formatMoney(account.base_balance || 0, { currency: summary.baseCurrency })}
+                  </p>
+                )}
               </div>
             </div>
           )

@@ -28,7 +28,7 @@ const getIcon = (name) => CAT_ICONS[name] || '\u{1F4CA}'
 const QUICK_TYPE_KEY = 'fintrack:transactions:quick-type'
 
 export default function Transactions() {
-  const { t, formatMoney } = useAppSettings()
+  const { t, formatMoney, currency } = useAppSettings()
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [categories, setCategories] = useState([])
@@ -36,9 +36,12 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [quoteLoading, setQuoteLoading] = useState(false)
+  const [quote, setQuote] = useState(null)
   const [form, setForm] = useState({
     type: 'EXPENSE',
     amount: '',
+    inputCurrency: 'UZS',
     accountId: '',
     categoryId: '',
     description: '',
@@ -47,9 +50,10 @@ export default function Transactions() {
 
   const load = async () => {
     try {
+      const base = new URLSearchParams({ baseCurrency: currency }).toString()
       const [txRes, accRes, catRes] = await Promise.all([
-        api.get('/transactions?limit=50' + (filter ? `&type=${filter}` : '')),
-        api.get('/accounts'),
+        api.get('/transactions?limit=50' + (filter ? `&type=${filter}` : '') + `&${base}`),
+        api.get(`/accounts?${base}`),
         api.get('/categories'),
       ])
 
@@ -69,7 +73,7 @@ export default function Transactions() {
 
   useEffect(() => {
     load()
-  }, [filter])
+  }, [filter, currency])
 
   useEffect(() => {
     const quickType = localStorage.getItem(QUICK_TYPE_KEY)
@@ -88,6 +92,49 @@ export default function Transactions() {
     () => categories.filter((category) => category.type === form.type),
     [categories, form.type],
   )
+  const selectedAccount = useMemo(
+    () => accounts.find((account) => account.id === form.accountId) || null,
+    [accounts, form.accountId],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    const amount = Number.parseFloat(form.amount)
+    if (!modalOpen || !form.accountId || !amount || amount <= 0) {
+      setQuote(null)
+      setQuoteLoading(false)
+      return () => {}
+    }
+
+    const loadQuote = async () => {
+      setQuoteLoading(true)
+      try {
+        const query = new URLSearchParams({
+          amount: String(amount),
+          accountId: form.accountId,
+          inputCurrency: form.inputCurrency || 'UZS',
+        }).toString()
+        const res = await api.get(`/transactions/quote?${query}`)
+        if (!cancelled) {
+          setQuote(res?.data || null)
+        }
+      } catch {
+        if (!cancelled) {
+          setQuote(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setQuoteLoading(false)
+        }
+      }
+    }
+
+    const timer = setTimeout(loadQuote, 200)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [modalOpen, form.amount, form.accountId, form.inputCurrency])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -102,6 +149,7 @@ export default function Transactions() {
       await api.post('/transactions', {
         type: form.type,
         amount: Number.parseFloat(form.amount),
+        inputCurrency: form.inputCurrency || 'UZS',
         accountId: form.accountId,
         categoryId: form.categoryId,
         description: form.description,
@@ -113,6 +161,7 @@ export default function Transactions() {
       setForm({
         type: 'EXPENSE',
         amount: '',
+        inputCurrency: 'UZS',
         accountId: accounts[0]?.id || '',
         categoryId: '',
         description: '',
@@ -244,6 +293,20 @@ export default function Transactions() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">{t('currency.label')}</label>
+                <select
+                  value={form.inputCurrency}
+                  onChange={(e) => setForm({ ...form, inputCurrency: e.target.value })}
+                  className="w-full rounded-xl border border-gray-700 bg-dark-900 px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+                >
+                  <option value="UZS">UZS</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="RUB">RUB</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1.5">{t('transactions.account')}</label>
                 <select value={form.accountId} onChange={(e) => setForm({ ...form, accountId: e.target.value })} className="w-full rounded-xl border border-gray-700 bg-dark-900 px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/30">
                   <option value="">{t('transactions.select')}</option>
@@ -252,6 +315,29 @@ export default function Transactions() {
                   ))}
                 </select>
               </div>
+
+              {(quoteLoading || quote) && (
+                <div className="rounded-xl border border-primary-500/30 bg-primary-500/10 px-3 py-2 text-xs text-primary-100">
+                  {quoteLoading && <p>{t('common.loading')}</p>}
+                  {!quoteLoading && quote && (
+                    <>
+                      <p>
+                        {formatMoney(quote.inputAmount, { currency: quote.inputCurrency })}
+                        {' -> '}
+                        {formatMoney(quote.accountAmount, { currency: quote.accountCurrency })}
+                      </p>
+                      <p className="mt-1 text-primary-200">
+                        Kurs: 1 {quote.inputCurrency} = {quote.exchangeRate.toFixed(6)} {quote.accountCurrency}
+                      </p>
+                      {form.type === 'EXPENSE' && selectedAccount && (
+                        <p className="mt-1 text-primary-200">
+                          Hisobdan yechiladi: {formatMoney(quote.accountAmount, { currency: selectedAccount.currency })}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1.5">{t('transactions.category')}</label>

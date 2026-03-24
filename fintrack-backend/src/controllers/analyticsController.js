@@ -1,8 +1,26 @@
 const db = require('../config/db');
 const { resolveScopeUserId } = require('../services/householdScopeService');
+const { getRatesWithLiveFallback, getRate, SUPPORTED_CURRENCIES } = require('../services/fxService');
 
 const VALID_TYPES = new Set(['INCOME', 'EXPENSE']);
 const VALID_PERIODS = new Set(['daily', 'weekly', 'monthly', 'yearly']);
+
+const normalizeCurrency = (value, fallback = 'UZS') => {
+  const code = String(value || '').trim().toUpperCase();
+  return SUPPORTED_CURRENCIES.includes(code) ? code : fallback;
+};
+
+const toNumber = (value) => {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const convertAmount = ({ amount, fromCurrency, toCurrency, rates }) => {
+  const conversion = getRate(fromCurrency, toCurrency, rates);
+  if (conversion?.error) return 0;
+  const rate = conversion?.rate || 1;
+  return toNumber(amount) * rate;
+};
 
 const parsePositiveInt = (value, fallback) => {
   const parsed = Number.parseInt(value, 10);
@@ -62,23 +80,30 @@ const getSummary = async (req, res, next) => {
     if (dateRange.error) {
       return res.status(400).json({ success: false, error: dateRange.error });
     }
+    const baseCurrency = normalizeCurrency(req.query.baseCurrency, 'UZS');
 
     const params = [scopeUserId];
-    const conds = ['user_id = $1'];
+    const conds = ['t.user_id = $1'];
     let idx = 2;
 
-    if (dateRange.from) { conds.push('date >= $' + idx); params.push(dateRange.from); idx++; }
-    if (dateRange.to) { conds.push('date <= $' + idx); params.push(dateRange.to); idx++; }
+    if (dateRange.from) { conds.push('t.date >= $' + idx); params.push(dateRange.from); idx++; }
+    if (dateRange.to) { conds.push('t.date <= $' + idx); params.push(dateRange.to); idx++; }
 
     const where = conds.join(' AND ');
 
     const totalsR = await db.query(
-      'SELECT COALESCE(SUM(CASE WHEN type = \'INCOME\' THEN amount ELSE 0 END), 0) AS total_income, COALESCE(SUM(CASE WHEN type = \'EXPENSE\' THEN amount ELSE 0 END), 0) AS total_expense FROM transactions WHERE ' + where,
+      `SELECT a.currency AS currency,
+        COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END), 0) AS total_income,
+        COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END), 0) AS total_expense
+       FROM transactions t
+       JOIN accounts a ON a.id = t.account_id
+       WHERE ${where}
+       GROUP BY a.currency`,
       params
     );
 
     const countR = await db.query(
-      'SELECT COUNT(*) AS count FROM transactions WHERE ' + where,
+      'SELECT COUNT(*) AS count FROM transactions t WHERE ' + where,
       params
     );
 
@@ -87,16 +112,39 @@ const getSummary = async (req, res, next) => {
       [scopeUserId]
     );
 
-    const { total_income, total_expense } = totalsR.rows[0];
+    const rates = await getRatesWithLiveFallback();
+    const totalsByCurrency = totalsR.rows.map((row) => ({
+      currency: row.currency,
+      totalIncome: toNumber(row.total_income),
+      totalExpense: toNumber(row.total_expense),
+    }));
+    const totalIncomeBase = totalsByCurrency.reduce(
+      (sum, row) => sum + convertAmount({ amount: row.totalIncome, fromCurrency: row.currency, toCurrency: baseCurrency, rates }),
+      0
+    );
+    const totalExpenseBase = totalsByCurrency.reduce(
+      (sum, row) => sum + convertAmount({ amount: row.totalExpense, fromCurrency: row.currency, toCurrency: baseCurrency, rates }),
+      0
+    );
+
+    const byAccount = accs.rows.map((a) => ({
+      ...a,
+      base_currency: baseCurrency,
+      base_balance: convertAmount({ amount: a.balance, fromCurrency: a.currency, toCurrency: baseCurrency, rates }),
+    }));
+    const totalBalanceBase = byAccount.reduce((sum, a) => sum + toNumber(a.base_balance), 0);
 
     res.json({
       success: true,
       data: {
-        totalIncome: parseFloat(total_income),
-        totalExpense: parseFloat(total_expense),
-        netBalance: parseFloat(total_income) - parseFloat(total_expense),
+        baseCurrency,
+        totalsByCurrency,
+        totalBalance: totalBalanceBase,
+        totalIncome: totalIncomeBase,
+        totalExpense: totalExpenseBase,
+        netBalance: totalIncomeBase - totalExpenseBase,
         transactionCount: parseInt(countR.rows[0].count, 10),
-        byAccount: accs.rows,
+        byAccount,
       },
     });
   } catch (error) {
@@ -111,6 +159,7 @@ const getByCategory = async (req, res, next) => {
     if (dateRange.error) {
       return res.status(400).json({ success: false, error: dateRange.error });
     }
+    const baseCurrency = normalizeCurrency(req.query.baseCurrency, 'UZS');
 
     const type = req.query.type || 'EXPENSE';
     if (!VALID_TYPES.has(type)) {
@@ -125,14 +174,39 @@ const getByCategory = async (req, res, next) => {
     if (dateRange.to) { conds.push('t.date <= $' + idx); params.push(dateRange.to); idx++; }
 
     const { rows } = await db.query(
-      'SELECT c.id AS category_id, c.name, c.icon, c.color, SUM(t.amount) AS total, COUNT(t.id) AS transaction_count FROM transactions t JOIN categories c ON c.id = t.category_id WHERE ' + conds.join(' AND ') + ' GROUP BY c.id, c.name, c.icon, c.color ORDER BY total DESC',
+      `SELECT c.id AS category_id, c.name, c.icon, c.color, a.currency AS currency,
+        SUM(t.amount) AS total, COUNT(t.id) AS transaction_count
+       FROM transactions t
+       JOIN categories c ON c.id = t.category_id
+       JOIN accounts a ON a.id = t.account_id
+       WHERE ${conds.join(' AND ')}
+       GROUP BY c.id, c.name, c.icon, c.color, a.currency
+       ORDER BY total DESC`,
       params
     );
 
-    const grandTotal = rows.reduce((sum, row) => sum + parseFloat(row.total), 0);
-    const withPercent = rows.map((row) => ({
+    const rates = await getRatesWithLiveFallback();
+    const map = new Map();
+    rows.forEach((row) => {
+      const key = row.category_id;
+      const prev = map.get(key) || {
+        category_id: row.category_id,
+        name: row.name,
+        icon: row.icon,
+        color: row.color,
+        total: 0,
+        transaction_count: 0,
+      };
+      prev.total += convertAmount({ amount: row.total, fromCurrency: row.currency, toCurrency: baseCurrency, rates });
+      prev.transaction_count += Number.parseInt(row.transaction_count, 10) || 0;
+      map.set(key, prev);
+    });
+    const aggregated = Array.from(map.values()).sort((a, b) => b.total - a.total);
+    const grandTotal = aggregated.reduce((sum, row) => sum + toNumber(row.total), 0);
+    const withPercent = aggregated.map((row) => ({
       ...row,
-      percentage: grandTotal > 0 ? Math.round((parseFloat(row.total) / grandTotal) * 1000) / 10 : 0,
+      baseCurrency,
+      percentage: grandTotal > 0 ? Math.round((toNumber(row.total) / grandTotal) * 1000) / 10 : 0,
     }));
 
     res.json({ success: true, data: withPercent });
@@ -148,6 +222,7 @@ const getByPeriod = async (req, res, next) => {
     if (dateRange.error) {
       return res.status(400).json({ success: false, error: dateRange.error });
     }
+    const baseCurrency = normalizeCurrency(req.query.baseCurrency, 'UZS');
 
     const period = req.query.period || 'monthly';
     if (!VALID_PERIODS.has(period)) {
@@ -167,11 +242,36 @@ const getByPeriod = async (req, res, next) => {
     if (period === 'yearly') dateExpr = "TO_CHAR(t.date, 'YYYY')";
 
     const { rows } = await db.query(
-      'SELECT ' + dateExpr + ' AS period, COALESCE(SUM(CASE WHEN t.type = \'INCOME\' THEN t.amount ELSE 0 END), 0) AS income, COALESCE(SUM(CASE WHEN t.type = \'EXPENSE\' THEN t.amount ELSE 0 END), 0) AS expense, COUNT(t.id) AS transaction_count FROM transactions t WHERE ' + conds.join(' AND ') + ' GROUP BY ' + dateExpr + ' ORDER BY ' + dateExpr + ' ASC',
+      `SELECT ${dateExpr} AS period, a.currency AS currency,
+        COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END), 0) AS income,
+        COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END), 0) AS expense,
+        COUNT(t.id) AS transaction_count
+       FROM transactions t
+       JOIN accounts a ON a.id = t.account_id
+       WHERE ${conds.join(' AND ')}
+       GROUP BY ${dateExpr}, a.currency
+       ORDER BY ${dateExpr} ASC`,
       params
     );
 
-    res.json({ success: true, data: rows });
+    const rates = await getRatesWithLiveFallback();
+    const byPeriodMap = new Map();
+    rows.forEach((row) => {
+      const key = row.period;
+      const prev = byPeriodMap.get(key) || {
+        period: row.period,
+        income: 0,
+        expense: 0,
+        transaction_count: 0,
+        baseCurrency,
+      };
+      prev.income += convertAmount({ amount: row.income, fromCurrency: row.currency, toCurrency: baseCurrency, rates });
+      prev.expense += convertAmount({ amount: row.expense, fromCurrency: row.currency, toCurrency: baseCurrency, rates });
+      prev.transaction_count += Number.parseInt(row.transaction_count, 10) || 0;
+      byPeriodMap.set(key, prev);
+    });
+
+    res.json({ success: true, data: Array.from(byPeriodMap.values()) });
   } catch (error) {
     next(error);
   }

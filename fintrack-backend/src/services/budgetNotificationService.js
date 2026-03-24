@@ -105,7 +105,7 @@ const buildBudgetAlertContent = ({ language, categoryName, percent, spent, limit
 const resolveStage = (percent) => {
   if (percent >= 100) return 'limit';
   if (percent >= 90) return 'danger';
-  if (percent >= 70) return 'warn';
+  if (percent >= 80) return 'warn';
   return null;
 };
 

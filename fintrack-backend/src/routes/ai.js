@@ -18,6 +18,11 @@ router.put('/settings', [
   body('language').optional().isIn(['uz', 'en', 'ru']).withMessage('language notogri'),
   body('model').optional().isString().isLength({ min: 3, max: 120 }).withMessage('model notogri'),
 ], validate, ctrl.updateSettings);
-router.post('/reports/send-now', ctrl.sendReportNow);
+router.post('/reports/send-now', [
+  body('reportPeriod').optional().isIn(['daily', 'weekly', 'monthly', 'yearly']).withMessage('reportPeriod notogri'),
+  body('timezone').optional().isString().isLength({ min: 2, max: 64 }).withMessage('timezone notogri'),
+  body('language').optional().isIn(['uz', 'en', 'ru']).withMessage('language notogri'),
+  body('model').optional().isString().isLength({ min: 3, max: 120 }).withMessage('model notogri'),
+], validate, ctrl.sendReportNow);
 
 module.exports = router;

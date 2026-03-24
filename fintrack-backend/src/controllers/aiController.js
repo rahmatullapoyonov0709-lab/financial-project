@@ -203,9 +203,11 @@ const sendReportNow = async (req, res, next) => {
   try {
     const scopeUserId = await resolveScopeUserId(req.user.id);
     const settings = await getOrCreateAiSettings(scopeUserId);
+    const override = sanitizeSettingsInput(req.body || {});
+    const effectiveSettings = { ...settings, ...override };
     const result = await createAiReportNotification({
       userId: scopeUserId,
-      settings,
+      settings: effectiveSettings,
       force: true,
       now: new Date(),
     });

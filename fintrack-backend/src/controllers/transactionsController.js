@@ -1,9 +1,17 @@
 const db = require('../config/db');
 const { logAudit } = require('../services/auditService');
 const { resolveScopeUserId } = require('../services/householdScopeService');
+const { ensureBudgetNotificationsForUser } = require('../services/budgetNotificationService');
+const { buildQuote, getRate, getRatesWithLiveFallback, SUPPORTED_CURRENCIES } = require('../services/fxService');
 
 const MAX_LIMIT = 100;
 const VALID_TYPES = new Set(['INCOME', 'EXPENSE']);
+const DEFAULT_INPUT_CURRENCY = 'UZS';
+const normalizeCurrency = (value, fallback = null) => {
+  const code = String(value || '').trim().toUpperCase();
+  if (!code) return fallback;
+  return SUPPORTED_CURRENCIES.includes(code) ? code : fallback;
+};
 
 const parsePositiveInt = (value, fallback) => {
   const parsed = Number.parseInt(value, 10);
@@ -22,9 +30,18 @@ const toAmount = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const triggerBudgetNotifications = async (userId) => {
+  try {
+    await ensureBudgetNotificationsForUser(userId);
+  } catch {
+    // Budget alert is non-blocking for transaction operations.
+  }
+};
+
 const getTransactions = async (req, res, next) => {
   try {
     const scopeUserId = await resolveScopeUserId(req.user.id);
+    const baseCurrency = normalizeCurrency(req.query.baseCurrency, null);
     const page = parsePositiveInt(req.query.page, 1);
     const limit = Math.min(parsePositiveInt(req.query.limit, 20), MAX_LIMIT);
     const offset = (page - 1) * limit;
@@ -71,10 +88,26 @@ const getTransactions = async (req, res, next) => {
       params
     );
 
+    let transactions = rows;
+    if (baseCurrency) {
+      const rates = await getRatesWithLiveFallback();
+      transactions = rows.map((tx) => {
+        const conversion = getRate(tx.account_currency, baseCurrency, rates);
+        const rate = conversion?.rate || 1;
+        return {
+          ...tx,
+          base_currency: baseCurrency,
+          base_amount: Number.parseFloat(tx.amount) * rate,
+          base_rate: rate,
+        };
+      });
+    }
+
     res.json({
       success: true,
       data: {
-        transactions: rows,
+        transactions,
+        baseCurrency: baseCurrency || null,
         pagination: {
           page,
           limit,
@@ -92,11 +125,16 @@ const createTransaction = async (req, res, next) => {
   try {
     const scopeUserId = await resolveScopeUserId(req.user.id);
     const { type, amount, accountId, categoryId, description, date } = req.body;
+    const inputCurrencyRaw = String(req.body.inputCurrency || DEFAULT_INPUT_CURRENCY).trim().toUpperCase();
+    const inputCurrency = SUPPORTED_CURRENCIES.includes(inputCurrencyRaw) ? inputCurrencyRaw : null;
     const normalizedAmount = toAmount(amount);
     const normalizedDate = date ? normalizeDate(date) : null;
 
     if (!VALID_TYPES.has(type)) {
       return res.status(400).json({ success: false, error: 'Turi notogri' });
+    }
+    if (!inputCurrency) {
+      return res.status(400).json({ success: false, error: 'Valyuta notogri' });
     }
     if (!normalizedAmount || normalizedAmount <= 0) {
       return res.status(400).json({ success: false, error: 'Summa notogri' });
@@ -115,8 +153,21 @@ const createTransaction = async (req, res, next) => {
         throw Object.assign(new Error('Hisob topilmadi'), { statusCode: 404 });
       }
 
-      const currentBalance = toAmount(accR.rows[0].balance) || 0;
-      if (type === 'EXPENSE' && currentBalance < normalizedAmount) {
+      const account = accR.rows[0];
+      const rates = await getRatesWithLiveFallback();
+      const quote = buildQuote({
+        amount: normalizedAmount,
+        fromCurrency: inputCurrency,
+        toCurrency: account.currency,
+        rates,
+      });
+      if (quote.error) {
+        throw Object.assign(new Error(quote.error), { statusCode: 400 });
+      }
+      const accountAmount = quote.toAmount;
+
+      const currentBalance = toAmount(account.balance) || 0;
+      if (type === 'EXPENSE' && currentBalance < accountAmount) {
         throw Object.assign(new Error('Hisobda mablag yetarli emas'), { statusCode: 400 });
       }
 
@@ -135,13 +186,13 @@ const createTransaction = async (req, res, next) => {
           accountId,
           categoryId,
           type,
-          normalizedAmount,
+          accountAmount,
           description ? String(description).trim() : null,
           normalizedDate || new Date(),
         ]
       );
 
-      const change = type === 'INCOME' ? normalizedAmount : -normalizedAmount;
+      const change = type === 'INCOME' ? accountAmount : -accountAmount;
       const accUpdate = await client.query(
         'UPDATE accounts SET balance = balance + $1 WHERE id = $2 AND user_id = $3',
         [change, accountId, scopeUserId]
@@ -167,10 +218,71 @@ const createTransaction = async (req, res, next) => {
         },
       });
 
-      return { transaction: txR.rows[0], newBalance: updAcc.rows[0].balance };
+      return {
+        transaction: txR.rows[0],
+        newBalance: updAcc.rows[0].balance,
+        quote: {
+          inputAmount: quote.fromAmount,
+          inputCurrency: quote.fromCurrency,
+          accountAmount: quote.toAmount,
+          accountCurrency: quote.toCurrency,
+          exchangeRate: quote.exchangeRate,
+        },
+      };
     });
 
+    if (result?.transaction?.type === 'EXPENSE') {
+      await triggerBudgetNotifications(req.user.id);
+    }
+
     res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getTransactionQuote = async (req, res, next) => {
+  try {
+    const scopeUserId = await resolveScopeUserId(req.user.id);
+    const amount = toAmount(req.query.amount);
+    const accountId = String(req.query.accountId || '').trim();
+    const inputCurrencyRaw = String(req.query.inputCurrency || DEFAULT_INPUT_CURRENCY).trim().toUpperCase();
+    const inputCurrency = SUPPORTED_CURRENCIES.includes(inputCurrencyRaw) ? inputCurrencyRaw : null;
+
+    if (!accountId) return res.status(400).json({ success: false, error: 'Hisob kerak' });
+    if (!amount || amount <= 0) return res.status(400).json({ success: false, error: 'Summa notogri' });
+    if (!inputCurrency) return res.status(400).json({ success: false, error: 'Valyuta notogri' });
+
+    const accR = await db.query(
+      'SELECT id, currency, balance FROM accounts WHERE id = $1 AND user_id = $2 LIMIT 1',
+      [accountId, scopeUserId]
+    );
+    if (!accR.rows.length) {
+      return res.status(404).json({ success: false, error: 'Hisob topilmadi' });
+    }
+    const account = accR.rows[0];
+    const rates = await getRatesWithLiveFallback();
+    const quote = buildQuote({
+      amount,
+      fromCurrency: inputCurrency,
+      toCurrency: account.currency,
+      rates,
+    });
+    if (quote.error) return res.status(400).json({ success: false, error: quote.error });
+
+    const balance = toAmount(account.balance) || 0;
+    res.json({
+      success: true,
+      data: {
+        inputAmount: quote.fromAmount,
+        inputCurrency: quote.fromCurrency,
+        accountAmount: quote.toAmount,
+        accountCurrency: quote.toCurrency,
+        exchangeRate: quote.exchangeRate,
+        currentBalance: balance,
+        balanceAfterExpense: Math.max(0, balance - quote.toAmount),
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -288,6 +400,10 @@ const updateTransaction = async (req, res, next) => {
       return { transaction: upR.rows[0] };
     });
 
+    if (result?.transaction?.type === 'EXPENSE') {
+      await triggerBudgetNotifications(req.user.id);
+    }
+
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -297,6 +413,7 @@ const updateTransaction = async (req, res, next) => {
 const deleteTransaction = async (req, res, next) => {
   try {
     const scopeUserId = await resolveScopeUserId(req.user.id);
+    let deletedTxType = null;
     await db.transaction(async (client) => {
       const txR = await client.query(
         'SELECT * FROM transactions WHERE id = $1 AND user_id = $2 FOR UPDATE',
@@ -308,6 +425,7 @@ const deleteTransaction = async (req, res, next) => {
       }
 
       const tx = txR.rows[0];
+      deletedTxType = tx.type;
       const rev = tx.type === 'INCOME' ? -parseFloat(tx.amount) : parseFloat(tx.amount);
 
       const accUpdate = await client.query(
@@ -335,10 +453,14 @@ const deleteTransaction = async (req, res, next) => {
       });
     });
 
+    if (deletedTxType === 'EXPENSE') {
+      await triggerBudgetNotifications(req.user.id);
+    }
+
     res.json({ success: true, message: 'Tranzaksiya ochirildi' });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { getTransactions, createTransaction, updateTransaction, deleteTransaction };
+module.exports = { getTransactions, createTransaction, updateTransaction, deleteTransaction, getTransactionQuote };

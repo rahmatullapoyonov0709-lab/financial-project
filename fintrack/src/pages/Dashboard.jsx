@@ -8,7 +8,7 @@ import { translateCategoryName } from '../utils/categoryTranslations'
 const QUICK_TYPE_KEY = 'fintrack:transactions:quick-type'
 
 export default function Dashboard({ navigate, user }) {
-  const { t, formatMoney, formatNumber, theme } = useAppSettings()
+  const { t, formatMoney, formatNumber, theme, currency } = useAppSettings()
   const [summary, setSummary] = useState(null)
   const [chartData, setChartData] = useState([])
   const [recentTx, setRecentTx] = useState([])
@@ -19,10 +19,11 @@ export default function Dashboard({ navigate, user }) {
   useEffect(() => {
     const load = async () => {
       try {
+        const base = new URLSearchParams({ baseCurrency: currency }).toString()
         const [s, p, txRes, b, householdRes] = await Promise.all([
-          api.get('/analytics/summary'),
-          api.get('/analytics/by-period?period=monthly'),
-          api.get('/transactions?limit=5'),
+          api.get(`/analytics/summary?${base}`),
+          api.get(`/analytics/by-period?period=monthly&${base}`),
+          api.get(`/transactions?limit=5&${base}`),
           api.get('/budgets'),
           api.get('/household/me'),
         ])
@@ -44,7 +45,7 @@ export default function Dashboard({ navigate, user }) {
     }
 
     load()
-  }, [])
+  }, [currency])
 
   if (loading) {
     return (
@@ -63,7 +64,7 @@ export default function Dashboard({ navigate, user }) {
   const tooltipLabel = isLight ? '#334155' : '#94A3B8'
 
   const totalBalance = summary?.byAccount?.reduce((sum, item) => (
-    item.currency === 'UZS' ? sum + Number.parseFloat(item.balance) : sum
+    sum + Number.parseFloat(item.base_balance || 0)
   ), 0) || 0
   const familyActive = Number(household?.members?.length || 0) > 1
 
@@ -128,7 +129,7 @@ export default function Dashboard({ navigate, user }) {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: t('dashboard.stats.totalBalance'), value: formatMoney(totalBalance, { currency: 'UZS' }), Icon: Wallet, tc: 'text-primary-400', bg: 'bg-primary-500/10' },
+          { label: t('dashboard.stats.totalBalance'), value: formatMoney(totalBalance, { currency }), Icon: Wallet, tc: 'text-primary-400', bg: 'bg-primary-500/10' },
           { label: t('dashboard.stats.income'), value: formatMoney(summary?.totalIncome || 0), Icon: TrendingUp, tc: 'text-success-400', bg: 'bg-success-500/10' },
           { label: t('dashboard.stats.expense'), value: formatMoney(summary?.totalExpense || 0), Icon: TrendingDown, tc: 'text-danger-400', bg: 'bg-danger-500/10' },
           { label: t('dashboard.stats.transactions'), value: t('dashboard.stats.count', { count: formatNumber(summary?.transactionCount || 0) }), Icon: Receipt, tc: 'text-warning-400', bg: 'bg-warning-500/10' },
@@ -194,7 +195,16 @@ export default function Dashboard({ navigate, user }) {
                       <span className="text-[10px] text-gray-500">{account.currency}</span>
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-semibold text-white">{formatMoney(account.balance, { currency: account.currency })}</span>
+                  <div className="text-right">
+                    <span className="block text-sm font-mono font-semibold text-white">
+                      {formatMoney(account.balance, { currency: account.currency })}
+                    </span>
+                    {account.currency !== currency && (
+                      <span className="block text-[11px] text-gray-500 font-mono">
+                        {formatMoney(account.base_balance || 0, { currency })}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -222,7 +232,7 @@ export default function Dashboard({ navigate, user }) {
                     </div>
                   </div>
                   <span className={`text-sm font-semibold font-mono ${tx.type === 'INCOME' ? 'text-success-400' : 'text-danger-400'}`}>
-                    {tx.type === 'INCOME' ? '+' : '-'}{formatMoney(tx.amount, { currency: tx.account_currency })}
+                    {tx.type === 'INCOME' ? '+' : '-'}{formatMoney(tx.base_amount ?? tx.amount, { currency })}
                   </span>
                 </div>
               ))}

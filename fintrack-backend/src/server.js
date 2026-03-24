@@ -21,6 +21,11 @@ const startServer = async () => {
 
   await runMigrations();
   await cleanupExpiredSessions();
+  logger.info('ai.scheduler_bootstrap', {
+    enabled: String(process.env.AI_REPORT_SCHEDULER || 'true').toLowerCase() !== 'false',
+    mode: String(process.env.AI_REPORT_SCHEDULER_MODE || 'cron').toLowerCase(),
+    nodeEnv: process.env.NODE_ENV || 'development',
+  });
   const stopAiScheduler = startAiReportScheduler();
 
   const server = app.listen(PORT, () => {

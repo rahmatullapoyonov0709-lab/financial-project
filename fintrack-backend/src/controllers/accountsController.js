@@ -2,10 +2,17 @@ const db = require('../config/db');
 const { logAudit } = require('../services/auditService');
 const { reconcileBalances } = require('../services/reconcileService');
 const { resolveScopeUserId } = require('../services/householdScopeService');
+const { getRatesWithLiveFallback, getRate, SUPPORTED_CURRENCIES } = require('../services/fxService');
+
+const normalizeCurrency = (value, fallback = 'UZS') => {
+  const code = String(value || '').trim().toUpperCase();
+  return SUPPORTED_CURRENCIES.includes(code) ? code : fallback;
+};
 
 const getAccounts = async (req, res, next) => {
   try {
     const scopeUserId = await resolveScopeUserId(req.user.id);
+    const baseCurrency = normalizeCurrency(req.query.baseCurrency, 'UZS');
     const { rows } = await db.query(
       'SELECT id, name, type, currency, balance, created_at FROM accounts WHERE user_id = $1 ORDER BY created_at',
       [scopeUserId]
@@ -16,9 +23,30 @@ const getAccounts = async (req, res, next) => {
       totalByCurrency[a.currency] = (totalByCurrency[a.currency] || 0) + parseFloat(a.balance);
     });
 
+    const rates = await getRatesWithLiveFallback();
+    const accounts = rows.map((a) => {
+      const conversion = getRate(a.currency, baseCurrency, rates);
+      const rate = conversion?.rate || 1;
+      const baseBalance = parseFloat(a.balance) * rate;
+      return {
+        ...a,
+        base_currency: baseCurrency,
+        base_balance: baseBalance,
+        base_rate: rate,
+      };
+    });
+
+    const totalBaseBalance = accounts.reduce((sum, a) => sum + (Number.parseFloat(a.base_balance) || 0), 0);
+
     res.json({
       success: true,
-      data: { accounts: rows, totalByCurrency, count: rows.length }
+      data: {
+        accounts,
+        totalByCurrency,
+        totalBaseBalance,
+        baseCurrency,
+        count: rows.length,
+      }
     });
   } catch (error) {
     next(error);

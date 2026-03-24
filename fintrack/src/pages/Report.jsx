@@ -366,7 +366,7 @@ const describeChange = (name, change, t, formatMoney) => {
 }
 
 export default function Report() {
-  const { t, formatMoney, theme } = useAppSettings()
+  const { t, formatMoney, theme, currency } = useAppSettings()
   const mapCategoryName = useCallback((name) => translateCategoryName(name, t), [t])
   const [period, setPeriod] = useState('daily')
   const initialRefs = getDefaultRefs('daily', new Date())
@@ -406,13 +406,14 @@ export default function Report() {
     const nonce = Date.now()
 
     try {
+      const base = new URLSearchParams({ baseCurrency: currency }).toString()
       const [summaryCurrentRes, summaryPreviousRes, expenseCurrentRes, expensePreviousRes, incomeCurrentRes, incomePreviousRes] = await Promise.all([
-        api.get(withRange('/analytics/summary', currentRange, nonce)),
-        api.get(withRange('/analytics/summary', previousRange, nonce)),
-        api.get(withRange('/analytics/by-category?type=EXPENSE', currentRange, nonce)),
-        api.get(withRange('/analytics/by-category?type=EXPENSE', previousRange, nonce)),
-        api.get(withRange('/analytics/by-category?type=INCOME', currentRange, nonce)),
-        api.get(withRange('/analytics/by-category?type=INCOME', previousRange, nonce)),
+        api.get(withRange(`api/analytics/summary?${base}`, currentRange, nonce)),
+        api.get(withRange(`api/analytics/summary?${base}`, previousRange, nonce)),
+        api.get(withRange(`api/analytics/by-category?type=EXPENSE&${base}`, currentRange, nonce)),
+        api.get(withRange(`api/analytics/by-category?type=EXPENSE&${base}`, previousRange, nonce)),
+        api.get(withRange(`api/analytics/by-category?type=INCOME&${base}`, currentRange, nonce)),
+        api.get(withRange(`api/analytics/by-category?type=INCOME&${base}`, previousRange, nonce)),
       ])
 
       if (requestId !== requestRef.current) return
@@ -544,10 +545,10 @@ export default function Report() {
 
   const currentIncome = toAmount(report.currentSummary.totalIncome)
   const currentExpense = toAmount(report.currentSummary.totalExpense)
-  const currentNet = toAmount(report.currentSummary.netBalance)
+  const currentNet = toAmount(report.currentSummary.totalBalance ?? report.currentSummary.netBalance)
   const previousIncome = toAmount(report.previousSummary.totalIncome)
   const previousExpense = toAmount(report.previousSummary.totalExpense)
-  const previousNet = toAmount(report.previousSummary.netBalance)
+  const previousNet = toAmount(report.previousSummary.totalBalance ?? report.previousSummary.netBalance)
 
   const incomeChange = calcChange(currentIncome, previousIncome)
   const expenseChange = calcChange(currentExpense, previousExpense)

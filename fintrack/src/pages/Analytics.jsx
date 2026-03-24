@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { TrendingUp, TrendingDown, ArrowUpDown } from 'lucide-react'
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { api } from '../api'
@@ -8,7 +8,7 @@ import { translateCategoryName } from '../utils/categoryTranslations'
 const COLORS = ['#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#F97316', '#10B981', '#3B82F6', '#9E9E9E']
 
 export default function Analytics() {
-  const { t, formatMoney, theme } = useAppSettings()
+  const { t, formatMoney, theme, currency } = useAppSettings()
   const [period, setPeriod] = useState('monthly')
   const [summary, setSummary] = useState(null)
   const [byCategory, setByCategory] = useState([])
@@ -19,10 +19,11 @@ export default function Analytics() {
     const load = async () => {
       setLoading(true)
       try {
+        const base = new URLSearchParams({ baseCurrency: currency }).toString()
         const [s, c, p] = await Promise.all([
-          api.get('/analytics/summary'),
-          api.get('/analytics/by-category?type=EXPENSE'),
-          api.get(`/analytics/by-period?period=${period}`),
+          api.get(`/analytics/summary?${base}`),
+          api.get(`/analytics/by-category?type=EXPENSE&${base}`),
+          api.get(`/analytics/by-period?period=${period}&${base}`),
         ])
         setSummary(s.data)
         setByCategory(c.data.slice(0, 8))
@@ -39,7 +40,7 @@ export default function Analytics() {
     }
 
     load()
-  }, [period])
+  }, [period, currency])
 
   if (loading) return <div className="p-6 flex justify-center"><div className="w-8 h-8 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" /></div>
 
@@ -64,7 +65,7 @@ export default function Analytics() {
         {[
           { label: t('analytics.cards.income'), value: formatMoney(summary?.totalIncome || 0), Icon: TrendingUp, c: 'text-success-400', bg: 'bg-success-500/10' },
           { label: t('analytics.cards.expense'), value: formatMoney(summary?.totalExpense || 0), Icon: TrendingDown, c: 'text-danger-400', bg: 'bg-danger-500/10' },
-          { label: t('analytics.cards.net'), value: formatMoney(summary?.netBalance || 0), Icon: ArrowUpDown, c: 'text-primary-400', bg: 'bg-primary-500/10' },
+          { label: t('analytics.cards.net'), value: formatMoney((summary?.totalBalance ?? summary?.netBalance) || 0), Icon: ArrowUpDown, c: 'text-primary-400', bg: 'bg-primary-500/10' },
         ].map((item, index) => (
           <div key={index} className="bg-dark-800 rounded-2xl border border-gray-700/50 p-5">
             <div className="flex items-center gap-2 mb-2">

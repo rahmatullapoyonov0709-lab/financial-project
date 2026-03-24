@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const cron = require('node-cron');
 const { logger } = require('../utils/logger');
 const { resolveScopeUserId } = require('./householdScopeService');
 
@@ -16,7 +17,8 @@ const toNumber = (value) => {
 
 const parseClockToMinutes = (value) => {
   if (typeof value !== 'string') return null;
-  const match = value.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  const timeStr = value.substring(0, 5);
+  const match = timeStr.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
   if (!match) return null;
   return Number.parseInt(match[1], 10) * 60 + Number.parseInt(match[2], 10);
 };
@@ -443,7 +445,9 @@ const createAiReportNotification = async ({ userId, settings, force = false, now
   );
 
   const inserted = rows.length > 0;
-  if (!force) {
+  // Only mark as sent when notification was actually created.
+  // This prevents "sent" state from being persisted when the insert was skipped.
+  if (!force && inserted) {
     await db.query(
       'UPDATE user_ai_settings SET last_sent_period_key = $1, updated_at = NOW() WHERE user_id = $2',
       [periodMeta.key, userId]
@@ -486,37 +490,92 @@ const ensureDueAiReportForUser = async (userId, now = new Date()) => {
 
 let isTickRunning = false;
 let schedulerInterval = null;
+let schedulerCronTask = null;
 
 const runAiSchedulerTick = async () => {
   if (isTickRunning) return;
   isTickRunning = true;
 
   try {
+    const startedAt = Date.now();
     const { rows } = await db.query(
       `SELECT user_id, enabled, report_period, delivery_time, timezone, language, model, last_sent_period_key
        FROM user_ai_settings
        WHERE enabled = TRUE`
     );
 
+    logger.info('ai.scheduler_tick_started', { enabledUsers: rows.length });
+
     const now = new Date();
+    let checked = 0;
+    let skippedNonOwners = 0;
+    let matchedTime = 0;
+    let sent = 0;
+    let skippedAlreadySent = 0;
+    let skippedDuplicate = 0;
+    let failed = 0;
+
     for (const row of rows) {
+      checked += 1;
+
       const scopeUserId = await resolveScopeUserId(row.user_id);
       if (scopeUserId !== row.user_id) {
+        skippedNonOwners += 1;
         continue;
       }
 
       const periodMeta = getPeriodMeta(row.report_period, now, row.timezone);
+      // Use >= so missed exact-minute ticks after restart still send once per period.
       if (!isDeliveryDue(periodMeta.clock, row.delivery_time)) {
         continue;
       }
+      matchedTime += 1;
 
-      await createAiReportNotification({
-        userId: scopeUserId,
-        settings: row,
-        force: false,
-        now,
-      });
+      try {
+        const result = await createAiReportNotification({
+          userId: row.user_id,
+          settings: row,
+          force: false,
+          now,
+        });
+        if (result.sent) {
+          sent += 1;
+        } else if (result.reason === 'already_sent') {
+          skippedAlreadySent += 1;
+        } else if (result.reason === 'duplicate') {
+          skippedDuplicate += 1;
+        }
+        logger.info('ai.scheduler_job_result', {
+          userId: row.user_id,
+          period: row.report_period,
+          deliveryTime: row.delivery_time,
+          timezone: row.timezone,
+          localClock: periodMeta.clock,
+          result: result.reason,
+          sent: result.sent,
+          periodKey: result.periodKey,
+        });
+      } catch (error) {
+        failed += 1;
+        logger.warn('ai.scheduler_job_failed', {
+          userId: row.user_id,
+          deliveryTime: row.delivery_time,
+          timezone: row.timezone,
+          error: error.message,
+        });
+      }
     }
+
+    logger.info('ai.scheduler_tick_finished', {
+      checked,
+      skippedNonOwners,
+      matchedTime,
+      sent,
+      skippedAlreadySent,
+      skippedDuplicate,
+      failed,
+      durationMs: Date.now() - startedAt,
+    });
   } catch (error) {
     logger.warn('ai.scheduler_tick_failed', { error: error.message });
   } finally {
@@ -530,23 +589,56 @@ const startAiReportScheduler = () => {
     return () => {};
   }
 
-  if (schedulerInterval) {
-    return () => clearInterval(schedulerInterval);
+  if (schedulerCronTask || schedulerInterval) {
+    return () => {
+      if (schedulerCronTask) {
+        schedulerCronTask.stop();
+      }
+      if (schedulerInterval) {
+        clearInterval(schedulerInterval);
+      }
+    };
   }
 
-  const intervalMs = Number.parseInt(process.env.AI_REPORT_SCHEDULER_INTERVAL_MS || '5000', 10);
-  schedulerInterval = setInterval(() => {
-    runAiSchedulerTick().catch(() => {});
-  }, Number.isFinite(intervalMs) && intervalMs >= 5000 ? intervalMs : 5000);
-  schedulerInterval.unref();
+  const mode = String(process.env.AI_REPORT_SCHEDULER_MODE || 'cron').toLowerCase();
 
-  setTimeout(() => {
-    runAiSchedulerTick().catch(() => {});
-  }, 5000).unref();
+  if (mode === 'interval') {
+    const intervalMs = Number.parseInt(process.env.AI_REPORT_SCHEDULER_INTERVAL_MS || '5000', 10);
+    schedulerInterval = setInterval(() => {
+      runAiSchedulerTick().catch(() => {});
+    }, Number.isFinite(intervalMs) && intervalMs >= 5000 ? intervalMs : 5000);
+    schedulerInterval.unref();
+    setTimeout(() => {
+      runAiSchedulerTick().catch(() => {});
+    }, 5000).unref();
 
-  logger.info('ai.scheduler_started', { intervalMs: Number.isFinite(intervalMs) ? intervalMs : 5000 });
+    logger.info('ai.scheduler_started', {
+      mode: 'interval',
+      intervalMs: Number.isFinite(intervalMs) ? intervalMs : 5000,
+    });
+  } else {
+    schedulerCronTask = cron.schedule(
+      '* * * * *',
+      () => {
+        runAiSchedulerTick().catch(() => {});
+      },
+      { timezone: 'UTC' }
+    );
+    setTimeout(() => {
+      runAiSchedulerTick().catch(() => {});
+    }, 5000).unref();
+    logger.info('ai.scheduler_started', {
+      mode: 'cron',
+      expression: '* * * * *',
+      timezone: 'UTC',
+    });
+  }
 
   return () => {
+    if (schedulerCronTask) {
+      schedulerCronTask.stop();
+      schedulerCronTask = null;
+    }
     if (schedulerInterval) {
       clearInterval(schedulerInterval);
       schedulerInterval = null;

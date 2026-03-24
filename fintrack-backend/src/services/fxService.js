@@ -40,6 +40,65 @@ const parseRatesFromEnv = () => {
 };
 
 const getRates = () => parseRatesFromEnv();
+let liveRatesCache = null;
+let liveRatesFetchedAt = 0;
+const LIVE_RATES_TTL_MS = Number.parseInt(process.env.FX_LIVE_CACHE_TTL_MS || '1800000', 10);
+const FX_LIVE_ENABLED = String(process.env.FX_LIVE_ENABLED || 'false').toLowerCase() === 'true';
+
+const buildRatesFromUsdBase = (usdRates = {}) => {
+  const uzsPerUsd = toNumber(usdRates.UZS);
+  const eurPerUsd = toNumber(usdRates.EUR);
+  const rubPerUsd = toNumber(usdRates.RUB);
+  if (!uzsPerUsd || !eurPerUsd || !rubPerUsd) return null;
+
+  const rates = {
+    UZS: 1,
+    USD: uzsPerUsd,
+    EUR: uzsPerUsd / eurPerUsd,
+    RUB: uzsPerUsd / rubPerUsd,
+  };
+  return normalizeRates(rates);
+};
+
+const fetchLiveRates = async () => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD', {
+      method: 'GET',
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => null);
+    const apiRates = data?.rates;
+    if (!apiRates || typeof apiRates !== 'object') return null;
+    return buildRatesFromUsdBase(apiRates);
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+const getRatesWithLiveFallback = async () => {
+  if (!FX_LIVE_ENABLED) {
+    return getRates();
+  }
+
+  const now = Date.now();
+  if (liveRatesCache && now - liveRatesFetchedAt < LIVE_RATES_TTL_MS) {
+    return liveRatesCache;
+  }
+
+  const fetched = await fetchLiveRates();
+  if (fetched) {
+    liveRatesCache = fetched;
+    liveRatesFetchedAt = now;
+    return fetched;
+  }
+
+  return getRates();
+};
 
 const getCurrencyPrecision = (currency) => (String(currency || '').toUpperCase() === 'UZS' ? 0 : 2);
 
@@ -115,6 +174,7 @@ const buildQuote = ({ amount, fromCurrency, toCurrency, rates = getRates() }) =>
 module.exports = {
   SUPPORTED_CURRENCIES,
   getRates,
+  getRatesWithLiveFallback,
   getRate,
   buildQuote,
   getCurrencyPrecision,

@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "name": "FinTrack",
     "tagline": "Financial management",
@@ -577,6 +577,9 @@
       "timezone": "Time zone",
       "language": "Report language",
       "save": "Save AI settings",
+      "sendNow": "Send report now",
+      "sentNow": "Report sent",
+      "sentSkipped": "Report was already sent (might be a duplicate)",
       "test": "Send test report",
       "testSent": "Test report sent",
       "saved": "AI settings saved",

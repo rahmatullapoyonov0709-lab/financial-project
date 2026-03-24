@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus, X, ArrowLeftRight, ArrowRight, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api } from '../api'

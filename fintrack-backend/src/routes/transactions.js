@@ -7,10 +7,12 @@ const ctrl = require('../controllers/transactionsController');
 router.use(authenticate);
 
 router.get('/', ctrl.getTransactions);
+router.get('/quote', ctrl.getTransactionQuote);
 
 router.post('/', [
   body('type').isIn(['INCOME', 'EXPENSE']).withMessage('Turi kerak'),
   body('amount').isFloat({ gt: 0 }).withMessage('Summa kerak'),
+  body('inputCurrency').optional().isIn(['UZS', 'USD', 'EUR', 'RUB']).withMessage('Valyuta notogri'),
   body('accountId').isUUID().withMessage('Hisob kerak'),
   body('categoryId').isUUID().withMessage('Kategoriya kerak'),
   body('date').optional().isDate(),

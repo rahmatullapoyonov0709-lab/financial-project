@@ -72,7 +72,7 @@ export default function GoogleAuthButton({
     script.defer = true;
     script.onload = renderButton;
     document.head.appendChild(script);
-  }, [onSuccess, t]);
+  }, [onSuccess, t, type]);
 
   if (!GOOGLE_CLIENT_ID) {
     return (

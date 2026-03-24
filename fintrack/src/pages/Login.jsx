@@ -71,7 +71,7 @@ export default function Login({
             'url("https://images.unsplash.com/photo-1618044733300-9472054094ee?q=80&w=2671&auto=format&fit=crop")',
         }}
       >
-        <div className="absolute inset-0 bg-dark-950/80 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-dark-950/90 backdrop-blur-[2px]"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/60 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-950/80 to-transparent lg:w-2/3"></div>
       </div>
@@ -130,7 +130,7 @@ export default function Login({
 
           {/* Right Side: Glassmorphic Login Form */}
           <section className="flex flex-col justify-center">
-            <div className="relative w-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-dark-900/60 p-8 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-12 lg:p-10 xl:p-12">
+            <div className="relative w-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-dark-900/80 p-8 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-12 lg:p-10 xl:p-12">
               {/* Subtle inner glow */}
               <div className="absolute inset-0 rounded-[2.5rem] shadow-[inset_0_0_40px_rgba(255,255,255,0.02)] border-[0.5px] border-white/5 pointer-events-none"></div>
 

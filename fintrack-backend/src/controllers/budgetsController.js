@@ -1,10 +1,19 @@
 const db = require('../config/db');
 const { logAudit } = require('../services/auditService');
 const { resolveScopeUserId } = require('../services/householdScopeService');
+const { ensureBudgetNotificationsForUser } = require('../services/budgetNotificationService');
 
 const parsePositiveInt = (value, fallback) => {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const triggerBudgetNotifications = async (userId) => {
+  try {
+    await ensureBudgetNotificationsForUser(userId);
+  } catch {
+    // Budget alert generation should not block budget CRUD responses.
+  }
 };
 
 const getBudgets = async (req, res, next) => {
@@ -102,6 +111,8 @@ const createBudget = async (req, res, next) => {
       metadata: { month: normalizedMonth, year: normalizedYear, limitAmount: normalizedLimit },
     });
 
+    await triggerBudgetNotifications(req.user.id);
+
     res.status(201).json({ success: true, data: rows[0] });
   } catch (error) {
     next(error);
@@ -134,6 +145,8 @@ const updateBudget = async (req, res, next) => {
       metadata: { limitAmount: rows[0].limit_amount },
     });
 
+    await triggerBudgetNotifications(req.user.id);
+
     res.json({ success: true, data: rows[0] });
   } catch (error) {
     next(error);
@@ -159,6 +172,8 @@ const deleteBudget = async (req, res, next) => {
       entity: 'budget',
       entityId: req.params.id,
     });
+
+    await triggerBudgetNotifications(req.user.id);
 
     res.json({ success: true, message: 'Byudjet ochirildi' });
   } catch (error) {

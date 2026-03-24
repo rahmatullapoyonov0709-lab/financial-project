@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BellRing, Bot, Languages, LogOut, Moon, ShieldCheck, SlidersHorizontal, Sun, Trash2, UserRound, Wallet } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { api } from '../api'
@@ -76,6 +76,7 @@ export default function Settings({ user, onLogout, onUserUpdate }) {
   const [passwordSaving, setPasswordSaving] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiSaving, setAiSaving] = useState(false)
+  const [aiSending, setAiSending] = useState(false)
   const [aiSettings, setAiSettings] = useState({
     enabled: false,
     reportPeriod: 'daily',
@@ -254,6 +255,27 @@ export default function Settings({ user, onLogout, onUserUpdate }) {
       toast.error(error.message || t('settings.aiReports.loadError'))
     } finally {
       setAiSaving(false)
+    }
+  }
+
+  const handleSendAiReportNow = async () => {
+    setAiSending(true)
+    try {
+      const res = await api.post('/ai/reports/send-now', {
+        reportPeriod: aiSettings.reportPeriod,
+        timezone: aiSettings.timezone?.trim() || 'Asia/Tashkent',
+        language: aiSettings.language,
+      })
+      const data = res?.data || {}
+      if (data.sent) {
+        toast.success(t('settings.aiReports.sentNow'))
+      } else {
+        toast.success(t('settings.aiReports.sentSkipped'))
+      }
+    } catch (error) {
+      toast.error(error.message || t('settings.aiReports.loadError'))
+    } finally {
+      setAiSending(false)
     }
   }
 
@@ -526,6 +548,14 @@ export default function Settings({ user, onLogout, onUserUpdate }) {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     {aiSaving ? t('common.loading') : t('settings.aiReports.save')}
+                  </button>
+
+                  <button
+                    onClick={handleSendAiReportNow}
+                    disabled={aiSending || !aiSettings.enabled}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-700 text-gray-200 hover:bg-gray-700/40 text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    {aiSending ? t('common.loading') : t('settings.aiReports.sendNow')}
                   </button>
                 </div>
               )}

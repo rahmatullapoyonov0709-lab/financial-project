@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react'
+import { Suspense, lazy, useState, useEffect } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 import Sidebar from './components/Sidebar'
 import BottomNav from './components/BottomNav'
 import Header from './components/Header'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/ResetPassword'
-import Dashboard from './pages/Dashboard'
-import Accounts from './pages/Accounts'
-import Transactions from './pages/Transactions'
-import Transfers from './pages/Transfers'
-import Debts from './pages/Debts'
-import Budget from './pages/Budget'
-import Analytics from './pages/Analytics'
-import Report from './pages/Report'
-import Settings from './pages/Settings'
-import Notifications from './pages/Notifications'
-import Family from './pages/Family'
 import { api } from './api'
 import { useAppSettings } from './context/AppSettingsContext'
 
 const SIDEBAR_COLLAPSED_KEY = 'fintrack:sidebar:collapsed'
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Accounts = lazy(() => import('./pages/Accounts'))
+const Transactions = lazy(() => import('./pages/Transactions'))
+const Transfers = lazy(() => import('./pages/Transfers'))
+const Debts = lazy(() => import('./pages/Debts'))
+const Budget = lazy(() => import('./pages/Budget'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const Report = lazy(() => import('./pages/Report'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Notifications = lazy(() => import('./pages/Notifications'))
+const Family = lazy(() => import('./pages/Family'))
 
 export default function App() {
   const [page, setPage] = useState('dashboard')
@@ -31,6 +31,11 @@ export default function App() {
   const [resetToken, setResetToken] = useState('')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1')
   const { t } = useAppSettings()
+  const pageLoading = (
+    <div className="p-6 text-sm text-gray-400">
+      Yuklanmoqda...
+    </div>
+  )
 
   const clearInviteTokenFromUrl = () => {
     try {
@@ -127,32 +132,40 @@ export default function App() {
       <>
         <Toaster position="top-right" toastOptions={{ duration: 3000, style: { borderRadius: '12px', background: '#1E293B', color: '#E2E8F0', boxShadow: '0 10px 40px rgba(0,0,0,0.4)' } }} />
         {authPage === 'login' && (
-          <Login
-            onLogin={handleLogin}
-            onGoRegister={() => setAuthPage('register')}
-            onGoForgot={() => setAuthPage('forgot')}
-            invitePending={Boolean(inviteToken)}
-          />
+          <Suspense fallback={pageLoading}>
+            <Login
+              onLogin={handleLogin}
+              onGoRegister={() => setAuthPage('register')}
+              onGoForgot={() => setAuthPage('forgot')}
+              invitePending={Boolean(inviteToken)}
+            />
+          </Suspense>
         )}
         {authPage === 'register' && (
-          <Register
-            onLogin={handleLogin}
-            onGoLogin={() => setAuthPage('login')}
-            invitePending={Boolean(inviteToken)}
-          />
+          <Suspense fallback={pageLoading}>
+            <Register
+              onLogin={handleLogin}
+              onGoLogin={() => setAuthPage('login')}
+              invitePending={Boolean(inviteToken)}
+            />
+          </Suspense>
         )}
         {authPage === 'forgot' && (
-          <ForgotPassword onGoLogin={() => setAuthPage('login')} />
+          <Suspense fallback={pageLoading}>
+            <ForgotPassword onGoLogin={() => setAuthPage('login')} />
+          </Suspense>
         )}
         {authPage === 'reset' && (
-          <ResetPassword
-            token={resetToken}
-            onGoLogin={() => {
-              setResetToken('')
-              clearInviteTokenFromUrl()
-              setAuthPage('login')
-            }}
-          />
+          <Suspense fallback={pageLoading}>
+            <ResetPassword
+              token={resetToken}
+              onGoLogin={() => {
+                setResetToken('')
+                clearInviteTokenFromUrl()
+                setAuthPage('login')
+              }}
+            />
+          </Suspense>
         )}
       </>
     )
@@ -198,7 +211,9 @@ export default function App() {
           onOpenNotifications={() => setPage('notifications')}
         />
         <div key={page} style={{ animation: 'slideUp 0.2s ease-out' }}>
-          {pages[page] || pages.dashboard}
+          <Suspense fallback={pageLoading}>
+            {pages[page] || pages.dashboard}
+          </Suspense>
         </div>
       </main>
       <BottomNav page={page} setPage={setPage} />

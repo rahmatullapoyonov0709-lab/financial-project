@@ -53,12 +53,12 @@ export default function Register({
     }
     if (form.password !== form.confirm) {
       toast.error(t("auth.register.toasts.passwordMismatch"));
-      returjn;
+      return;
     }
 
     setLoading(true);
     try {
-      const res = await api.post("/api/auth/register", {
+      const res = await api.post("/auth/register", {
         name: form.name,
         email: form.email,
         password: form.password,
@@ -89,7 +89,7 @@ export default function Register({
             'url("https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2671&auto=format&fit=crop")',
         }}
       >
-        <div className="absolute inset-0 bg-dark-950/85 backdrop-blur-[3px]"></div>
+        <div className="absolute inset-0 bg-dark-950/95 backdrop-blur-[3px]"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-dark-950/40 to-dark-950 lg:w-1/2 lg:left-1/2"></div>
       </div>
@@ -98,7 +98,7 @@ export default function Register({
         <div className="grid w-full gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 xl:grid-cols-[0.8fr_1.2fr]">
           {/* Left Side: Right-aligned form */}
           <section className="flex flex-col justify-center order-2 lg:order-1">
-            <div className="relative w-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-dark-900/65 p-8 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-12 lg:p-10 xl:p-12">
+            <div className="relative w-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-dark-900/80 p-8 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-12 lg:p-10 xl:p-12">
               <div className="absolute inset-0 rounded-[2.5rem] shadow-[inset_0_0_40px_rgba(255,255,255,0.02)] border-[0.5px] border-white/5 pointer-events-none"></div>
 
               <div className="relative sm:mx-auto sm:w-full sm:max-w-md">

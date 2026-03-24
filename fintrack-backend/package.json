@@ -9,7 +9,8 @@
     "migrate": "node src/scripts/runMigrations.js",
     "db:backup": "powershell -ExecutionPolicy Bypass -File ./scripts/backup.ps1",
     "db:restore": "powershell -ExecutionPolicy Bypass -File ./scripts/restore.ps1",
-    "test": "node --test"
+    "test": "node --test",
+    "ai:verify": "node scripts/verifyAiReports.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -20,7 +21,8 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.9.15",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.3",
     "pg": "^8.13.0"
   }
 }

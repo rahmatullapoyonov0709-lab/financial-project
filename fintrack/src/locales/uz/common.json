@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "name": "FinTrack",
     "tagline": "Moliyaviy boshqaruv",
@@ -577,6 +577,9 @@
       "timezone": "Vaqt zonasi",
       "language": "Hisobot tili",
       "save": "AI sozlamalarni saqlash",
+      "sendNow": "Hisobotni hozir yuborish",
+      "sentNow": "Hisobot yuborildi",
+      "sentSkipped": "Hisobot allaqachon yuborilgan (dublikat bo‘lishi mumkin)",
       "test": "Sinov xabari yuborish",
       "testSent": "Sinov xabari yuborildi",
       "saved": "AI sozlamalar saqlandi",
