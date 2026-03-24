@@ -408,12 +408,12 @@ export default function Report() {
     try {
       const base = new URLSearchParams({ baseCurrency: currency }).toString()
       const [summaryCurrentRes, summaryPreviousRes, expenseCurrentRes, expensePreviousRes, incomeCurrentRes, incomePreviousRes] = await Promise.all([
-        api.get(withRange(`api/analytics/summary?${base}`, currentRange, nonce)),
-        api.get(withRange(`api/analytics/summary?${base}`, previousRange, nonce)),
-        api.get(withRange(`api/analytics/by-category?type=EXPENSE&${base}`, currentRange, nonce)),
-        api.get(withRange(`api/analytics/by-category?type=EXPENSE&${base}`, previousRange, nonce)),
-        api.get(withRange(`api/analytics/by-category?type=INCOME&${base}`, currentRange, nonce)),
-        api.get(withRange(`api/analytics/by-category?type=INCOME&${base}`, previousRange, nonce)),
+        api.get(withRange(`/analytics/summary?${base}`, currentRange, nonce)),
+        api.get(withRange(`/analytics/summary?${base}`, previousRange, nonce)),
+        api.get(withRange(`/analytics/by-category?type=EXPENSE&${base}`, currentRange, nonce)),
+        api.get(withRange(`/analytics/by-category?type=EXPENSE&${base}`, previousRange, nonce)),
+        api.get(withRange(`/analytics/by-category?type=INCOME&${base}`, currentRange, nonce)),
+        api.get(withRange(`/analytics/by-category?type=INCOME&${base}`, previousRange, nonce)),
       ])
 
       if (requestId !== requestRef.current) return
