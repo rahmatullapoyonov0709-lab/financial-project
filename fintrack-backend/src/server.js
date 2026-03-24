@@ -42,7 +42,6 @@ const startServer = async () => {
     });
   }, 6 * 60 * 60 * 1000).unref();
 
-  // Bug fix: Graceful shutdown — wait for active connections to drain before exit
   process.on('SIGTERM', () => {
     logger.info('server.shutdown_signal');
     stopAiScheduler();
@@ -50,7 +49,6 @@ const startServer = async () => {
       logger.info('server.shutdown_complete');
       process.exit(0);
     });
-    // Force exit if connections don't close within 10 seconds
     setTimeout(() => {
       logger.warn('server.shutdown_forced');
       process.exit(1);

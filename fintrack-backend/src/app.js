@@ -20,6 +20,7 @@ const defaultAllowedOrigins = [
   'https://financial-project-7qj3.vercel.app',
   'https://financial-project-git-6ff294-rahmatullapoyonov0709-5108s-projects.vercel.app',
   'https://financial-project-7qj3-cxazupe9i.vercel.app',
+  'https://financial-project-1.onrender.com'
 ];
 const configuredOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
@@ -41,6 +42,7 @@ app.use(cors({
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
   maxAge: 600,
 }));
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '1mb', strict: true }));
