@@ -14,7 +14,7 @@ const shouldUseSSL = sslMode !== 'disable' && sslMode !== 'allow';
 
 const poolConfig = {
   connectionString: process.env.DATABASE_URL,
-  max: 10,
+  max: Number.parseInt(process.env.PG_POOL_MAX || '10', 10),
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
   query_timeout: Number.parseInt(process.env.PG_QUERY_TIMEOUT_MS || '15000', 10),
@@ -23,9 +23,7 @@ const poolConfig = {
 };
 
 if (shouldUseSSL) {
-  poolConfig.ssl = {
-    rejectUnauthorized: false,
-  };
+  poolConfig.ssl = { rejectUnauthorized: false };
 }
 
 const pool = new Pool(poolConfig);
@@ -45,6 +43,7 @@ const transaction = async (callback) => {
     return result;
   } catch (error) {
     await client.query('ROLLBACK');
+    logger.error('db.transaction_failed', { error: error.message });
     throw error;
   } finally {
     client.release();
